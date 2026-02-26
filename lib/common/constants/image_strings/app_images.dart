@@ -1,0 +1,53 @@
+class AppImages {
+  static String splashimage = 'assets/images/splashimage.webp';
+  static String onboarding1 = 'assets/images/onboarding_1.png';
+  static String onboarding2 = 'assets/images/onboarding_2.png';
+  static String onboarding3 = 'assets/images/onboarding_3.png';
+  static String male = 'assets/images/male.png';
+  static String female = 'assets/images/female.png';
+  static String gym ='assets/images/gym.png';
+  static String homeGym = 'assets/images/home_gym.png';
+  static String yoga = 'assets/images/yoga.png';
+  static String stretch = 'assets/images/stretch.png';
+  static String quickFix = 'assets/images/quick_fix.png';
+  static String pushUp = 'assets/images/push_up.png';
+  static String posture = 'assets/images/posture.png';
+  static String lowerBodyHolding = 'assets/images/lower_body_holding.png';
+  static String cardio = 'assets/images/cardio.png';
+  // static String uniqueTips = 'assets/images/uniqueTips.webp';
+  // static String soilTips = 'assets/images/soilTips.webp';
+  // static String seasonalTips = 'assets/images/seasonalTips.webp';
+  // static String lightTips = 'assets/images/lightTips.webp';
+  // static String growthTips = 'assets/images/growthTips.webp';
+  // static String disease = 'assets/images/disease.webp';
+  // static String splashIcon = 'assets/images/splash_icon.webp';
+  // static String bgImage = 'assets/images/Bg.webp';
+  // static String multi = 'assets/images/multi.webp';
+  // static String perfectScan = 'assets/images/perfect_scan.webp';
+  // static String toClose = 'assets/images/to_close.webp';
+  // static String toFar = 'assets/images/to_far.webp';
+
+  // static String anthrancose = 'assets/images/Anthrancose.webp';
+  // static String bacterialWilt = 'assets/images/Bacterial_wilt.webp';
+  // static String botrytisBlight = 'assets/images/Botrytis Blight.webp';
+  // static String mealyBugs = 'assets/images/Mealybugs.webp';
+  // static String scaleInsects = 'assets/images/Scale_insects.webp';
+  // static String sootyMold = 'assets/images/Sooty_mold.webp';
+  // static String thripsDamage = 'assets/images/Thrips_damage.webp';
+  // static String whiteFlies = 'assets/images/White_flies.webp';
+
+  // static String energyboost1 = 'assets/images/energyboost1.webp';
+  // static String energyboost2 = 'assets/images/energyboost2.webp';
+  // static String energyboost3 = 'assets/images/energyboost3.webp';
+  // static String energyboost4 = 'assets/images/energyboost4.webp';
+  // static String energyboost5 = 'assets/images/energyboost5.webp';
+  // static String energyboost6 = 'assets/images/energyboost6.webp';
+  // static String energyboost7 = 'assets/images/energyboost7.webp';
+  // static String mood1 = 'assets/images/mood1.webp';
+  // static String mood2 = 'assets/images/mood2.webp';
+  // static String mood3 = 'assets/images/mood3.webp';
+  // static String mood4 = 'assets/images/mood4.webp';
+  // static String mood5 = 'assets/images/mood5.webp';
+  // static String mood6 = 'assets/images/mood6.webp';
+  // static String mood7 = 'assets/images/mood7.webp';
+}

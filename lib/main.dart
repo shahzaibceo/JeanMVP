@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:attention_anchor/feature/bottom_nav/cubit/bottom_cubit.dart';
 import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';
 import 'package:attention_anchor/feature/onboarding/cubit/onboarding_cubit.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -25,7 +26,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+ SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   // Initialize Storage
   final storage = await HydratedStorage.build(
     storageDirectory: HydratedStorageDirectory(
@@ -79,6 +80,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => LanguageCubit()),
          BlocProvider(create: (_) => OnboardingCubit()),
           BlocProvider(create: (_) => HabitCubit()),
+          BlocProvider(create: (_) => BottomBarCubit()),
       ],
       child: const AppView(),
     );

@@ -16,13 +16,39 @@ import 'package:attention_anchor/theme/app_colors.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'dart:async';
 import 'package:flutter_svg/flutter_svg.dart';
 
 
-class HabitDetailsScreen extends StatelessWidget {
+class HabitDetailsScreen extends StatefulWidget {
   final HabitModel habit;
   const HabitDetailsScreen({super.key, required this.habit});
+
+  @override
+  State<HabitDetailsScreen> createState() => _HabitDetailsScreenState();
+}
+
+class _HabitDetailsScreenState extends State<HabitDetailsScreen>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      // App went to background - auto-pause timer
+      context.read<HabitCubit>().autoPauseTimer();
+    }
+  }
 
   Duration _parseDuration(String s) {
     final parts = s.split(':');
@@ -36,7 +62,7 @@ class HabitDetailsScreen extends StatelessWidget {
     final themeCubit = context.watch<ThemeCubit>();
     final habitCubit = context.watch<HabitCubit>(); 
     final resp = ResponsiveHelper(context);
-    final totalDuration = _parseDuration(habit.timerDuration);
+    final totalDuration = _parseDuration(widget.habit.timerDuration);
 
     return MainBackground(
       appBar: AppBarWidget(
@@ -54,12 +80,12 @@ class HabitDetailsScreen extends StatelessWidget {
                     ),
               ),
             ).onTap(() {
-              int habitIndex = context.read<HabitCubit>().state.habits.indexOf(habit);
+              int habitIndex = context.read<HabitCubit>().state.habits.indexOf(widget.habit);
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => HabitCreationView(
-                    habitToEdit: habit,
+                    habitToEdit: widget.habit,
                     index: habitIndex,
                   ),
                 ),
@@ -125,7 +151,7 @@ class HabitDetailsScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CustomText(
-                      text: habit.name,
+                      text: widget.habit.name,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             color: themeCubit.textColor,
                             fontWeight: FontWeight.w600,
@@ -157,7 +183,7 @@ class HabitDetailsScreen extends StatelessWidget {
                     const Icon(Icons.local_fire_department, color: Colors.green, size: 18),
                     4.sbw(context),
                     CustomText(
-                      text: "${habit.streak} ${"day_streak".tr()}",
+                      text: "${widget.habit.streak} ${"day_streak".tr()}",
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: Colors.green,
                         fontWeight: FontWeight.w600
@@ -201,7 +227,7 @@ class HabitDetailsScreen extends StatelessWidget {
                       child: CustomButton(
                         borderRadius: resp.radius(12),
                         onTap: () {
-                          final index = context.read<HabitCubit>().state.habits.indexOf(habit);
+                          final index = context.read<HabitCubit>().state.habits.indexOf(widget.habit);
                           context.read<HabitCubit>().deleteHabit(index);
                           Navigator.pop(context);
                         },

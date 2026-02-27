@@ -7,6 +7,7 @@ import 'package:attention_anchor/common/extensions/padding_extension.dart';
 import 'package:attention_anchor/common/extensions/sized_box.dart';
 import 'package:attention_anchor/common/services/analytics_services.dart';
 import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
+import 'package:attention_anchor/feature/bottom_nav/page/bottomnav_page.dart';
 import 'package:attention_anchor/feature/habit_creation/page/habit_creation_screen.dart';
 import 'package:attention_anchor/feature/localization/cubit/language_cubit.dart';
 import 'package:attention_anchor/feature/localization/cubit/language_state.dart';
@@ -124,12 +125,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             buildSettingTile(
               iconPath: AppIcons.aboutUs,
               title: 'about_us'.tr(),
-              // onTap: () {
-              //   AnalyticsService.logEvent("about_us_clicked");
-              //   Navigator.of(context).push(
-              //     MaterialPageRoute(builder: (context) => AboutUs()),
-              //   );
-              // },
+              onTap: () {
+                AnalyticsService.logEvent("about_us_clicked");
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => BottomNavigationBarScreen(  
+       )),
+                );
+              },
               context: context,
             ).withSymmetricPadding(horizontal: resp.wp(20)),
 

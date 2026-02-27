@@ -13,9 +13,9 @@ class AppIcons {
   static String aboutUs = 'assets/icons/about_us.svg';
   static String language = 'assets/icons/language.svg';
   static String icon = 'assets/icons/icon.svg';
-  // static String biceps = 'assets/icons/biceps.svg';
-  // static String apple = 'assets/icons/apple.svg';
-  // static String waterFill = 'assets/icons/water_fill.svg';
+  static String home = 'assets/icons/home.svg';
+  static String streak = 'assets/icons/streak.svg';
+  static String setting = 'assets/icons/setting.svg';
   // static String settingFill = 'assets/icons/setting_fill.svg';
   // static String homeFill = 'assets/icons/home_fill.svg';
   // static String delete = 'assets/icons/delete.svg';

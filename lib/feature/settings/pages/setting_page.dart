@@ -73,9 +73,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
             ).withSymmetricPadding(horizontal: resp.wp(20)),
 
-            10.sbh(context),
-
-            // Notifications Tile
             buildSettingTile(
               iconPath: AppIcons.notification,
               title: 'notifications'.tr(),
@@ -95,7 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               context: context,
             ).withSymmetricPadding(horizontal: resp.wp(20)),
 
-            10.sbh(context),
+    
 
             // Appearance Tile
             buildSettingTile(
@@ -116,8 +113,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onTap: () => _showThemeDialog(context, themeCubit),
             ).withSymmetricPadding(horizontal: resp.wp(20)),
 
-            20.sbh(context),
-
             // Data & Privacy Policy Section
             _buildSectionTitle(context, 'data_privacy_policy'.tr(), themeCubit, resp),
             
@@ -127,10 +122,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: 'about_us'.tr(),
               onTap: () {
                 AnalyticsService.logEvent("about_us_clicked");
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => BottomNavigationBarScreen(  
-       )),
-                );
+      //           Navigator.of(context).push(
+      //             MaterialPageRoute(builder: (context) => BottomNavigationBarScreen(  
+      //  )),
+      //           );
               },
               context: context,
             ).withSymmetricPadding(horizontal: resp.wp(20)),
@@ -152,11 +147,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             buildSettingTile(
               iconPath: AppIcons.privacy,
               title: 'privacy_policy'.tr(),
-               onTap: () {
-                   Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => HabitCreationView()),
-                );
-               },
+              //  onTap: () {
+              //      Navigator.of(context).push(
+              //     MaterialPageRoute(builder: (context) => HabitCreationView()),
+              //   );
+              //  },
 
               // onTap: () async {
               //   AnalyticsService.logEvent("privacy_policy_clicked");

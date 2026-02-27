@@ -126,7 +126,7 @@ class HabitsListScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => HabitDetailsScreen(habit: habit),
+                        builder: (context) => HabitDetailsScreen(habitIndex: index),
                       ),
                     );
                   });

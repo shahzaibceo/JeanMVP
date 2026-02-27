@@ -64,7 +64,7 @@ class CustomButton extends StatelessWidget {
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: fontWeight ?? FontWeight.w500,
               color: buttonTextColor,
-              fontSize:  responsive.fontSize(20),
+              fontSize: textSize?? responsive.fontSize(20),
             ),
           ),
           if (suffixIcon != null) ...[

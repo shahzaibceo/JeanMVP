@@ -60,11 +60,18 @@ class _HabitCreationViewState extends State<HabitCreationView> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final cubit = context.read<HabitCubit>();
         cubit.updatePeriod(parts[1]);
-        if (widget.habitToEdit != null) cubit.setInitialDays(widget.habitToEdit!.days);
+        if (widget.habitToEdit != null) {
+          cubit.setInitialDays(widget.habitToEdit!.days);
+          cubit.toggleReminder(widget.habitToEdit!.isReminderOn);
+        }
       });
     } else {
       _fromHours = TextEditingController();
       _fromMints = TextEditingController();
+      // Reset reminder for new habits
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<HabitCubit>().toggleReminder(false);
+      });
     }
 
     // Logic for splitting Timer Duration
@@ -169,12 +176,12 @@ class _HabitCreationViewState extends State<HabitCreationView> {
     String reminderTime = "${_fromHours.text.isEmpty ? "00" : _fromHours.text}:${_fromMints.text.isEmpty ? "00" : _fromMints.text} ${habitCubit.state.fromPeriod}";
 
     if (widget.habitToEdit != null) {
-      final updatedHabit = HabitModel(
+      final updatedHabit = widget.habitToEdit!.copyWith(
         name: _nameController.text,
         days: habitCubit.state.selectedDays,
         time: reminderTime,
         timerDuration: timerDur,
-        streak: widget.habitToEdit!.streak,
+        isReminderOn: habitCubit.state.isReminderOn,
       );
       habitCubit.updateHabit(widget.index!, updatedHabit);
       Navigator.pop(context);

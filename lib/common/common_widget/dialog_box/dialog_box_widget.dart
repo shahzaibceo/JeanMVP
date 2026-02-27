@@ -1,60 +1,95 @@
-import 'package:attention_anchor/common/common_widget/dialog_box/dialog_button.dart';
+import 'package:flutter/material.dart';
+import 'package:attention_anchor/common/common_widget/custom_conrtainer.dart';
+import 'package:attention_anchor/common/common_widget/custom_text.dart';
+import 'package:attention_anchor/common/common_widget/custom_button.dart'; // Aapka custom button
+import 'package:attention_anchor/common/extensions/sized_box.dart';
 import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-void showDeleteDialog({
-  required BuildContext context,
-  required String title,
-  required String message,
-  required VoidCallback onYesTap,
-}) {
-  final resp = ResponsiveHelper(context);
-  final themeCubit = context.read<ThemeCubit>();
+class CustomConfirmationDialog extends StatelessWidget {
+  final String title;
+  final String message;
+  final String confirmText;
+  final String cancelText;
+  final VoidCallback onConfirm;
+  final Color? confirmButtonColor;
+  final ThemeCubit themeCubit;
 
-  showDialog(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      backgroundColor: themeCubit.containerColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: themeCubit.textPrimaryColor,
-              fontSize: resp.fontSize(20),
+  const CustomConfirmationDialog({
+    super.key,
+    required this.title,
+    required this.message,
+    required this.onConfirm,
+    required this.themeCubit,
+    this.confirmText = "Yes, delete",
+    this.cancelText = "Cancel",
+    this.confirmButtonColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final resp = ResponsiveHelper(context);
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: CustomContainer(
+        padding: EdgeInsets.all(resp.wp(24)),
+        borderRadius: resp.radius(24),
+        color: themeCubit.containerColor,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CustomText(
+              text: title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: themeCubit.textColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+              textAlign: TextAlign.center,
             ),
-      ),
-      content: Text(
-        message,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: themeCubit.textPrimaryColor,
+            16.sbh(context),
+            CustomText(
+              text: message,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: themeCubit.unselectedColor,
+                    height: 1.5,
+                  ),
+              textAlign: TextAlign.center,
             ),
-      ),
-      actionsPadding: EdgeInsets.symmetric(
-        horizontal: resp.wp(20),
-        vertical: resp.hp(10),
-      ),
-      actions: [
-        dialogButton(
-          context,
-          "No",
-          themeCubit.textPrimaryColor,
-          themeCubit.backgroundColor,
-          () => Navigator.of(ctx).pop(),
+            24.sbh(context),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomButton(
+                    borderRadius: resp.radius(12),
+                    onTap: () {
+                      onConfirm();
+                      Navigator.pop(context); // Dialog close karega
+                    },
+                    text: confirmText,
+                    color: confirmButtonColor, // Custom color for delete/logout
+                    height: resp.hp(50),
+                    textSize: resp.fontSize(14),
+                  ),
+                ),
+                12.sbw(context),
+                Expanded(
+                  child: CustomButton(
+                    borderRadius: resp.radius(12),
+                    onTap: () => Navigator.pop(context),
+                    text: cancelText,
+                    color: themeCubit.greyColor,
+                    textColor: themeCubit.textColor,
+                    borderColor: Colors.transparent,
+                    textSize: resp.fontSize(14),
+                    height: resp.hp(50),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-        dialogButton(
-          context,
-          "Yes",
-          themeCubit.backgroundColor,
-          themeCubit.textPrimaryColor,
-          onYesTap,
-        ),
-      ],
-    ),
-  );
+      ),
+    );
+  }
 }

@@ -11,6 +11,7 @@ import 'package:attention_anchor/common/extensions/sized_box.dart';
 import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
 import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';
 import 'package:attention_anchor/feature/habit_creation/page/habit_creation_screen.dart';
+import 'package:attention_anchor/feature/habit_creation/widget/habit_detail_widget/dialog_box_widget.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart'; 
 import 'package:attention_anchor/theme/app_colors.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
@@ -20,8 +21,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 
 class HabitDetailsScreen extends StatefulWidget {
-  final HabitModel habit;
-  const HabitDetailsScreen({super.key, required this.habit});
+  final int habitIndex;
+  const HabitDetailsScreen({super.key, required this.habitIndex});
 
   @override
   State<HabitDetailsScreen> createState() => _HabitDetailsScreenState();
@@ -57,12 +58,32 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
     return Duration(hours: h, minutes: m);
   }
 
+  String _formatDate(int timestamp) {
+    final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    final months = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+    return "${date.day} ${months[date.month - 1]}, ${date.year}";
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final themeCubit = context.watch<ThemeCubit>();
     final habitCubit = context.watch<HabitCubit>(); 
     final resp = ResponsiveHelper(context);
-    final totalDuration = _parseDuration(widget.habit.timerDuration);
+    
+    // Get habit directly from index - always in sync with cubit state
+    if (widget.habitIndex < 0 || widget.habitIndex >= habitCubit.state.habits.length) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Error')),
+        body: const Center(child: Text('Habit not found')),
+      );
+    }
+    
+    final habit = habitCubit.state.habits[widget.habitIndex];
+    final totalDuration = _parseDuration(habit.timerDuration);
 
     return MainBackground(
       appBar: AppBarWidget(
@@ -80,13 +101,12 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                     ),
               ),
             ).onTap(() {
-              int habitIndex = context.read<HabitCubit>().state.habits.indexOf(widget.habit);
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => HabitCreationView(
-                    habitToEdit: widget.habit,
-                    index: habitIndex,
+                    habitToEdit: habit,
+                    index: widget.habitIndex,
                   ),
                 ),
               );
@@ -108,32 +128,30 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                   height: resp.hp(210),
                   width: resp.hp(210),
                   child: CircularProgressIndicator(
-                    value: habitCubit.state.elapsedPercent,
+                    value: habit.timerElapsedPercent,
                     strokeWidth: 8,
                     color: AppColors.primary,
                     backgroundColor: themeCubit.greyColor.withOpacity(0.3),
                   ),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    if (habitCubit.state.isRunning) {
-                      habitCubit.pauseTimer();
-                    } else {
-                      habitCubit.startTimer(totalDuration);
-                    }
-                  },
-                  child: CustomText(
-                    text: habitCubit.state.isRunning
-                        ? "${(habitCubit.state.elapsedPercent * 100).toStringAsFixed(0)}%"
-                        : (habitCubit.state.elapsedPercent > 0 ? "resume".tr() : "start".tr()),
-                    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                          color: themeCubit.textColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
+                CustomText(
+                  text: habit.timerIsRunning
+                      ? "${(habit.timerElapsedPercent * 100).toStringAsFixed(0)}%"
+                      : (habit.timerElapsedPercent > 0 ? "resume".tr() : "start".tr()),
+                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                        color: themeCubit.textColor,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ],
-            ),
+            ).onTap((){
+                    if (habit.timerIsRunning) {
+                      habitCubit.pauseTimer(widget.habitIndex);
+                    } else {
+                      habitCubit.startTimer(widget.habitIndex, totalDuration);
+                    }
+                  
+            }),
           ),
 
           40.sbh(context),
@@ -151,7 +169,7 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     CustomText(
-                      text: widget.habit.name,
+                      text: habit.name,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             color: themeCubit.textColor,
                             fontWeight: FontWeight.w600,
@@ -183,10 +201,24 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                     const Icon(Icons.local_fire_department, color: Colors.green, size: 18),
                     4.sbw(context),
                     CustomText(
-                      text: "${widget.habit.streak} ${"day_streak".tr()}",
+                      text: "${habit.streak} ${"day_streak".tr()}",
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: Colors.green,
                         fontWeight: FontWeight.w600
+                      ),
+                    ),
+                  ],
+                ),
+                8.sbh(context),
+                Row(
+                  children: [
+                    const Icon(Icons.timer, color: AppColors.primary, size: 18),
+                    4.sbw(context),
+                    CustomText(
+                      text: habit.timerDuration,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: themeCubit.textColor,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
@@ -202,7 +234,7 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                 5.sbh(context),
 
                   CustomText(
-                  text: "${"starts_from".tr()} 16 Feb, 2026", 
+                  text: "${"starts_from".tr()} ${_formatDate(habit.createdAt)}", 
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: themeCubit.unselectedColor),
                 ),
                 20.sbh(context),
@@ -212,13 +244,13 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                       child: CustomButton(
                         borderRadius: resp.radius(12),
                         onTap: () {
-                          if (habitCubit.state.isRunning) {
-                            habitCubit.pauseTimer();
+                          if (habit.timerIsRunning) {
+                            habitCubit.pauseTimer(widget.habitIndex);
                           } else {
-                            habitCubit.startTimer(totalDuration);
+                            habitCubit.startTimer(widget.habitIndex, totalDuration);
                           }
                         },
-                        text: habitCubit.state.isRunning ? "pause".tr() : "resume".tr(),
+                        text: habit.timerIsRunning ? "pause".tr() : (habit.timerElapsedPercent > 0 ? "resume".tr() : "start".tr()),
                         height: resp.hp(50),
                       ),
                     ),
@@ -226,11 +258,8 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                     Expanded(
                       child: CustomButton(
                         borderRadius: resp.radius(12),
-                        onTap: () {
-                          final index = context.read<HabitCubit>().state.habits.indexOf(widget.habit);
-                          context.read<HabitCubit>().deleteHabit(index);
-                          Navigator.pop(context);
-                        },
+                        onTap: () => showDeleteDialog(
+                            context,widget.habitIndex ),
                         text: "delete".tr(),
                         color: themeCubit.greyColor,
                         textColor: themeCubit.textColor,

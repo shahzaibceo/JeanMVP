@@ -50,76 +50,64 @@ class HabitsListScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            CustomText(
-                              text: habit.name,
-                              style:Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color:   themeCubit.textColor,
-                    fontWeight: FontWeight.w600
-                  ),
-                            ),
-                            CustomContainer(
-                              height: resp.hp(42),
-                              width: resp.wp(42),
-                              borderRadius: resp.radius(10),
-                              color: AppColors.primary.withOpacity(0.1),
-                              child: Center(
-                                child: SvgPicture.asset(
-                                  AppIcons.icon,
-                                  width: resp.wp(22),
-                                  height: resp.hp(22),
-                                  colorFilter: ColorFilter.mode(
-                                    AppColors.primary, 
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        4.sbh(context),
+                             CustomText(
+                               text: habit.name,
+                               style:Theme.of(context).textTheme.titleSmall?.copyWith(
+                     color:   themeCubit.textColor,
+                     fontWeight: FontWeight.w600
+                   ),
+                             ),
+                             CustomContainer(
+                               height: resp.hp(42),
+                               width: resp.wp(42),
+                               borderRadius: resp.radius(10),
+                               color: AppColors.primary.withOpacity(0.1),
+                               child: Center(
+                                 child: SvgPicture.asset(
+                                   AppIcons.icon,
+                                   width: resp.wp(22),
+                                   height: resp.hp(22),
+                                   colorFilter: ColorFilter.mode(
+                                     AppColors.primary, 
+                                     BlendMode.srcIn,
+                                   ),
+                                 ),
+                               ),
+                             ),
+                           ],
+                         ),
+                         4.sbh(context),
                         Row(
                           children: [
-                            const Icon(Icons.local_fire_department,
-                                color: Colors.green, size: 16),
-                            4.sbw(context),
-                            CustomText(
-                              text: "${habit.streak} ${"day_streak".tr()}",
-                              
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color:   Colors.green,
-                    fontWeight: FontWeight.w500
-                  ),
-                            ),
+                             const Icon(Icons.timer, color: AppColors.primary, size: 18),
+                    4.sbw(context),
+
+                             CustomText(
+                           text: habit.timerDuration,
+                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                             color: themeCubit.textColor,
+                             fontWeight: FontWeight.w500,
+                           ),
+                         ),
                           ],
-                        ),
-                        16.sbh(context),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomButton(
-                                borderRadius: resp.radius(12),
-                                onTap: () {},
-                                text: "done".tr(), 
-                                color: AppColors.primary,
-                                textColor: Colors.white,
-                                borderColor: Colors.transparent,
-                                height: resp.hp(50),
-                              ),
-                            ),
-                            12.sbw(context),
-                            Expanded(
-                              child: CustomButton(
-                                borderRadius: resp.radius(12),
-                                onTap: () {},
-                                text: "skipped".tr(), 
-                                color: themeCubit.greyColor,
-                                textColor: themeCubit.textColor,
-                                borderColor: Colors.transparent,
-                                height: resp.hp(50),
-                              ),
-                            ),
-                          ],
-                        )
+                        ) ,
+                        
+                         Row(
+                           children: [
+                             const Icon(Icons.local_fire_department,
+                                 color: Colors.green, size: 16),
+                             4.sbw(context),
+                             CustomText(
+                               text: "${habit.streak} ${"day_streak".tr()}",
+                               
+                               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                     color:   Colors.green,
+                     fontWeight: FontWeight.w500
+                   ),
+                             ),
+                           ],
+                         ),
+                     
                       ],
                     ),
                   ).onTap(() {

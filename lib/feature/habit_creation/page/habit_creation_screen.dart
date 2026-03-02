@@ -120,21 +120,41 @@ class _HabitCreationViewState extends State<HabitCreationView> {
               
               24.sbh(context),
               SectionHeader(label: "set_timer".tr(), textColor: themeCubit.textColor,),
-              buildTimerBox(
-                themeCubit: themeCubit,
-                resp: resp,
-                context: context,
-                hController: _timerHours,
-                mController: _timerMints,
-              ),
+              // buildTimerBox(
+              //   themeCubit: themeCubit,
+              //   resp: resp,
+              //   context: context,
+              //   hController: _timerHours,
+              //   mController: _timerMints,
+              // ),
+              TimerBox(
+  themeCubit: themeCubit,
+  resp: resp,
+  hController: _timerHours,
+  mController: _timerMints,
+),
               
               24.sbh(context),
-              buildReminderSwitch(habitCubit, themeCubit, resp, context),
+              // buildReminderSwitch(habitCubit, themeCubit, resp, context),
+              ReminderSwitch(
+  habitCubit: habitCubit,
+  themeCubit: themeCubit,
+  resp: resp,
+),
               
               if (habitCubit.state.isReminderOn) ...[
                 16.sbh(context),
-                buildTimeInputCard(context, themeCubit, resp, _fromHours, _fromMints, 
-                    habitCubit.state.fromPeriod, (val) => habitCubit.updatePeriod(val)),
+                // buildTimeInputCard(context, themeCubit, resp, _fromHours, _fromMints, 
+                //     habitCubit.state.fromPeriod, (val) => habitCubit.updatePeriod(val)),
+
+                TimeInputCard(
+  themeCubit: themeCubit,
+  resp: resp,
+  hController: _fromHours,
+  mController: _fromMints,
+  period: habitCubit.state.fromPeriod,
+  onPeriodChange:  (val) => habitCubit.updatePeriod(val)),
+
               ],
               
               40.sbh(context),
@@ -149,21 +169,23 @@ class _HabitCreationViewState extends State<HabitCreationView> {
 
   Widget _buildActionButton(ResponsiveHelper resp, HabitCubit habitCubit) {
     bool isEdit = widget.habitToEdit != null;
-    return CustomContainer(
-      width: double.infinity,
-      height: resp.hp(56),
-      borderRadius: resp.radius(18),
-      color: AppColors.primary,
-      child: Center(
-        child: CustomText(
-          text: (isEdit ? "update" : "save").tr(),
-          style:  Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppColors.white,
-                    fontWeight: FontWeight.w600
-                  ),
+    return Center(
+      child: CustomContainer(
+         width: resp.wp(300),
+        height: resp.hp(56),
+        borderRadius: resp.radius(18),
+        color: AppColors.primary,
+        child: Center(
+          child: CustomText(
+            text: (isEdit ? "update" : "save").tr(),
+            style:  Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: AppColors.white,
+                      fontWeight: FontWeight.w600
+                    ),
+          ),
         ),
-      ),
-    ).onTap(() => _handleSave(habitCubit));
+      ).onTap(() => _handleSave(habitCubit)),
+    );
   }
 
   void _handleSave(HabitCubit habitCubit) {
@@ -193,7 +215,7 @@ class _HabitCreationViewState extends State<HabitCreationView> {
         period: habitCubit.state.fromPeriod,
         timerDuration: timerDur,
       );
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const HabitsListScreen()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HabitsListScreen()));
     }
   }
 }

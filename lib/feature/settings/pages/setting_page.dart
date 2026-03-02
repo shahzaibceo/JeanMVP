@@ -7,8 +7,6 @@ import 'package:attention_anchor/common/extensions/padding_extension.dart';
 import 'package:attention_anchor/common/extensions/sized_box.dart';
 import 'package:attention_anchor/common/services/analytics_services.dart';
 import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
-import 'package:attention_anchor/feature/bottom_nav/page/bottomnav_page.dart';
-import 'package:attention_anchor/feature/habit_creation/page/habit_creation_screen.dart';
 import 'package:attention_anchor/feature/localization/cubit/language_cubit.dart';
 import 'package:attention_anchor/feature/localization/cubit/language_state.dart';
 import 'package:attention_anchor/feature/localization/page/localization_page.dart';

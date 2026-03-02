@@ -10,7 +10,7 @@ class AppTheme {
     scaffoldBackgroundColor: AppColors.backgroundLight,
     primaryColor: AppColors.primary,
     appBarTheme: const AppBarTheme(
-      systemOverlayStyle: SystemUiOverlayStyle.dark, // Black icons
+      systemOverlayStyle: SystemUiOverlayStyle.dark, 
       backgroundColor: Colors.transparent,
       elevation: 0,
     ),

@@ -1,5 +1,8 @@
 import 'dart:ui';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:attention_anchor/feature/bottom_nav/cubit/bottom_cubit.dart';
+import 'package:attention_anchor/feature/bottom_nav/page/bottomnav_page.dart';
+import 'package:attention_anchor/feature/dashboard/cubit/dashboard_cubit.dart';
 import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';
 import 'package:attention_anchor/feature/onboarding/cubit/onboarding_cubit.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -14,7 +17,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:attention_anchor/feature/localization/cubit/language_cubit.dart';
-import 'package:attention_anchor/feature/localization/cubit/language_state.dart';
 import 'package:attention_anchor/feature/localization/page/localization_page.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:attention_anchor/theme/theme.dart';
@@ -36,8 +38,8 @@ void main() async {
   );
   HydratedBloc.storage = storage;
 
-  // Initialize notifications channel before anything else
   await NotificationHelper.initialize();
+  await initializeDateFormatting();
 
   // Initialize Firebase
   await Firebase.initializeApp(
@@ -85,6 +87,7 @@ class MyApp extends StatelessWidget {
          BlocProvider(create: (_) => OnboardingCubit()),
           BlocProvider(create: (_) => HabitCubit()),
           BlocProvider(create: (_) => BottomBarCubit()),
+           BlocProvider(create: (_) => SetupProgressCubit()),
       ],
       child: const AppView(),
     );
@@ -94,32 +97,31 @@ class MyApp extends StatelessWidget {
 class AppView extends StatelessWidget {
   const AppView({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ThemeCubit, ThemeState>(
-      builder: (context, themeState) {
-        return BlocBuilder<LanguageCubit, LanguageState>(
-          builder: (context, langState) {
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              title: "Attention Anchor",
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              themeMode: themeState.themeMode,
-              locale: Locale(langState.selectedLanguageCode),
-              builder: (context, child) {
-                return Directionality(
-                  textDirection: langState.selectedLanguageCode == 'ar'
-                      ? TextDirection.rtl
-                      : TextDirection.ltr,
-                  child: child??Container(),
-                );
-              },
-              home:  SelectLanguageScreen(showBackButton: false,),
-            );
-          },
-        );
-      },
-    );
-  }
+    @override
+Widget build(BuildContext context) {
+  final themeState = context.watch<ThemeCubit>().state;
+  final langState = context.watch<LanguageCubit>().state;
+  final onboardingState = context.watch<OnboardingCubit>().state;
+
+  return MaterialApp(
+    debugShowCheckedModeBanner: false,
+    title: "Attention Anchor",
+    theme: AppTheme.lightTheme,
+    darkTheme: AppTheme.darkTheme,
+    themeMode: themeState.themeMode,
+    locale: Locale(langState.selectedLanguageCode),
+    builder: (context, child) {
+      return Directionality(
+        textDirection: langState.selectedLanguageCode == 'ar'
+            ? TextDirection.rtl
+            : TextDirection.ltr,
+        child: child ?? const SizedBox(),
+      );
+    },
+    home: onboardingState.isCompleted
+        ? const BottomNavigationBarScreen()
+        : const SelectLanguageScreen(showBackButton: false),
+  );
+}
+  // }
 }

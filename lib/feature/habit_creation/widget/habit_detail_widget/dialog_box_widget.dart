@@ -13,9 +13,9 @@ void showDeleteDialog(BuildContext context,int habitIndex) {
     context: context,
     builder: (context) => CustomConfirmationDialog(
       themeCubit: themeCubit,
-      title: "Delete Habit Focus",
-      message: "Are you sure, you want to delete\nthis Habit focus activity?",
-      confirmText: "Yes, delete",
+      title: "delete_habit".tr(),
+      message: "delete_habit_confirm".tr(),
+      confirmText: "yes_delete".tr(),
       cancelText: "cancel".tr(),
       onConfirm: () {
         habitCubit.deleteHabit(habitIndex);

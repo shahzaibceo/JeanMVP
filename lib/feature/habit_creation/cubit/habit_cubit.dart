@@ -12,6 +12,7 @@ class HabitModel {
   final bool timerIsRunning;
   final int? timerStartTime;
   final int? timerTotalDurationMs;
+  final String? lastCompletedDate; // "YYYY-MM-DD"
 
   HabitModel({
     required this.name, 
@@ -25,6 +26,7 @@ class HabitModel {
     this.timerIsRunning = false,
     this.timerStartTime,
     this.timerTotalDurationMs,
+    this.lastCompletedDate,
   });
 
   // Convert HabitModel to JSON
@@ -40,6 +42,7 @@ class HabitModel {
     'timerIsRunning': timerIsRunning,
     'timerStartTime': timerStartTime,
     'timerTotalDurationMs': timerTotalDurationMs,
+    'lastCompletedDate': lastCompletedDate,
   };
 
   // Create HabitModel from JSON
@@ -55,6 +58,7 @@ class HabitModel {
     timerIsRunning: map['timerIsRunning'] ?? false,
     timerStartTime: map['timerStartTime'],
     timerTotalDurationMs: map['timerTotalDurationMs'],
+    lastCompletedDate: map['lastCompletedDate'],
   );
 
   HabitModel copyWith({
@@ -69,6 +73,7 @@ class HabitModel {
     bool? timerIsRunning,
     int? timerStartTime,
     int? timerTotalDurationMs,
+    String? lastCompletedDate,
   }) {
     return HabitModel(
       name: name ?? this.name,
@@ -82,6 +87,7 @@ class HabitModel {
       timerIsRunning: timerIsRunning ?? this.timerIsRunning,
       timerStartTime: timerStartTime ?? this.timerStartTime,
       timerTotalDurationMs: timerTotalDurationMs ?? this.timerTotalDurationMs,
+      lastCompletedDate: lastCompletedDate ?? this.lastCompletedDate,
     );
   }
 }
@@ -131,7 +137,9 @@ class HabitState {
 }
 
 class HabitCubit extends HydratedCubit<HabitState> {
-  HabitCubit() : super(HabitState());
+  HabitCubit() : super(HabitState()) {
+    checkAndResetHabits();
+  }
 
   @override
   HabitState? fromJson(Map<String, dynamic> json) {
@@ -157,7 +165,84 @@ class HabitCubit extends HydratedCubit<HabitState> {
     }
     final elapsedMs = DateTime.now().millisecondsSinceEpoch - habit.timerStartTime!;
     final percent = elapsedMs / habit.timerTotalDurationMs!;
-    return percent > 1.0 ? 1.0 : percent;
+    return percent >= 1.0 ? 1.0 : percent;
+  }
+
+  // Update logic for day-specific streaks and resets
+  void checkAndResetHabits() {
+    final now = DateTime.now();
+    final todayStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    List<HabitModel> updatedHabits = List.from(state.habits);
+    bool changed = false;
+
+    for (int i = 0; i < updatedHabits.length; i++) {
+      final habit = updatedHabits[i];
+      
+      // Reset daily progress only if it's a scheduled day and not completed today
+      if (habit.lastCompletedDate != todayStr && _isDaySelected(habit, now)) {
+        if (habit.timerElapsedPercent != 0.0 || habit.timerIsRunning) {
+          updatedHabits[i] = habit.copyWith(
+            timerElapsedPercent: 0.0,
+            timerIsRunning: false,
+            timerStartTime: null,
+            timerTotalDurationMs: null,
+          );
+          changed = true;
+        }
+      }
+
+      // Streak Reset Logic: Breaks only if a selected day was missed entirely
+      if (_shouldStreakReset(habit, now)) {
+        updatedHabits[i] = updatedHabits[i].copyWith(streak: 0);
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      emit(state.copyWith(habits: updatedHabits));
+    }
+  }
+
+  bool _isDaySelected(HabitModel habit, DateTime date) {
+    if (habit.days.isEmpty) return false;
+    final Map<String, int> dayMap = {
+      'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6, 'sun': 7
+    };
+    final List<int> selectedWeekdays =
+        habit.days.map((d) => dayMap[d.toLowerCase()] ?? 1).toList();
+    return selectedWeekdays.contains(date.weekday);
+  }
+
+  bool _shouldStreakReset(HabitModel habit, DateTime now) {
+    if (habit.days.isEmpty) return false;
+    
+    // Get numeric weekdays from habit.days (mon=1, sun=7)
+    final Map<String, int> dayMap = {
+      'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6, 'sun': 7
+    };
+    final List<int> selectedWeekdays = habit.days.map((d) => dayMap[d.toLowerCase()] ?? 1).toList();
+    
+    // Look back from yesterday to find the most recent selected day
+    for (int d = 1; d <= 7; d++) {
+      final checkDate = now.subtract(Duration(days: d));
+      final checkDateStr = "${checkDate.year}-${checkDate.month.toString().padLeft(2, '0')}-${checkDate.day.toString().padLeft(2, '0')}";
+      
+      if (selectedWeekdays.contains(checkDate.weekday)) {
+        // If this was a selected day, and it wasn't completed, streak breaks
+        if (habit.lastCompletedDate != checkDateStr) {
+            // But wait, if they completed it *after* that day (not possible with daily reset, but good to be safe)
+            // If the last completion is older than this missing mandatory day, streak is dead.
+            if (habit.lastCompletedDate == null) return true;
+            final lastComp = DateTime.parse(habit.lastCompletedDate!);
+            if (lastComp.isBefore(DateTime(checkDate.year, checkDate.month, checkDate.day))) {
+                return true;
+            }
+        }
+        // If we found the latest selected day and it's fine, stop looking back
+        return false;
+      }
+    }
+    return false;
   }
 
   // Auto-pause timer when app goes to background
@@ -228,18 +313,40 @@ class HabitCubit extends HydratedCubit<HabitState> {
 
       if (percent >= 1.0) {
         t.cancel();
-        _updateHabitTimer(
-          _activeHabitIndex!,
-          isRunning: false,
-          elapsedPercent: 1.0,
-          timerStartTime: null,
-          timerTotalDurationMs: null,
-        );
+        completeHabit(_activeHabitIndex!);
         _activeHabitIndex = null;
       } else {
         _updateHabitTimer(_activeHabitIndex!, elapsedPercent: percent);
       }
     });
+  }
+
+  void completeHabit(int index) {
+    if (index < 0 || index >= state.habits.length) return;
+    final habit = state.habits[index];
+    final now = DateTime.now();
+    final todayStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    
+    // Only increment streak if not already completed today
+    int newStreak = habit.streak;
+    if (habit.lastCompletedDate != todayStr) {
+      newStreak += 1;
+    }
+
+    _updateHabitTimer(
+      index,
+      isRunning: false,
+      elapsedPercent: 1.0,
+      timerStartTime: null,
+      timerTotalDurationMs: null,
+    );
+
+    List<HabitModel> updatedHabits = List.from(state.habits);
+    updatedHabits[index] = updatedHabits[index].copyWith(
+      streak: newStreak,
+      lastCompletedDate: todayStr,
+    );
+    emit(state.copyWith(habits: updatedHabits));
   }
 
   void pauseTimer(int habitIndex) {

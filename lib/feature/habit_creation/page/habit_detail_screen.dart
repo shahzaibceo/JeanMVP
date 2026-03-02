@@ -61,8 +61,8 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
   String _formatDate(int timestamp) {
     final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
     final months = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      "jan".tr(), "feb".tr(), "mar".tr(), "apr".tr(), "may".tr(), "jun".tr(),
+      "jul".tr(), "aug".tr(), "sep".tr(), "oct".tr(), "nov".tr(), "dec".tr()
     ];
     return "${date.day} ${months[date.month - 1]}, ${date.year}";
   }
@@ -77,8 +77,8 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
     // Get habit directly from index - always in sync with cubit state
     if (widget.habitIndex < 0 || widget.habitIndex >= habitCubit.state.habits.length) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Error')),
-        body: const Center(child: Text('Habit not found')),
+        appBar: AppBar(title: Text('error'.tr())),
+        body: Center(child: Text('habit_not_found'.tr())),
       );
     }
     
@@ -135,16 +135,20 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                   ),
                 ),
                 CustomText(
-                  text: habit.timerIsRunning
-                      ? "${(habit.timerElapsedPercent * 100).toStringAsFixed(0)}%"
-                      : (habit.timerElapsedPercent > 0 ? "resume".tr() : "start".tr()),
+                  text: habit.timerElapsedPercent >= 1.0 
+                      ? "completed".tr() 
+                      : (habit.timerIsRunning
+                          ? "${(habit.timerElapsedPercent * 100).toStringAsFixed(0)}%"
+                          : (habit.timerElapsedPercent > 0 ? "resume".tr() : "start".tr())),
                   style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                         color: themeCubit.textColor,
                         fontWeight: FontWeight.bold,
+                        fontSize: habit.timerElapsedPercent >= 1.0 ? resp.hp(32) : null,
                       ),
                 ),
               ],
             ).onTap((){
+                    if (habit.timerElapsedPercent >= 1.0) return; // Disable if completed
                     if (habit.timerIsRunning) {
                       habitCubit.pauseTimer(widget.habitIndex);
                     } else {
@@ -244,14 +248,20 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                       child: CustomButton(
                         borderRadius: resp.radius(12),
                         onTap: () {
+                          if (habit.timerElapsedPercent >= 1.0) return;
                           if (habit.timerIsRunning) {
                             habitCubit.pauseTimer(widget.habitIndex);
                           } else {
                             habitCubit.startTimer(widget.habitIndex, totalDuration);
                           }
                         },
-                        text: habit.timerIsRunning ? "pause".tr() : (habit.timerElapsedPercent > 0 ? "resume".tr() : "start".tr()),
+                        text: habit.timerElapsedPercent >= 1.0 
+                            ? "completed".tr() 
+                            : (habit.timerIsRunning ? "pause".tr() : (habit.timerElapsedPercent > 0 ? "resume".tr() : "start".tr())),
                         height: resp.hp(50),
+                        color: habit.timerElapsedPercent >= 1.0 ? Colors.green.withOpacity(0.2) : AppColors.primary,
+                        textColor: habit.timerElapsedPercent >= 1.0 ? Colors.green : AppColors.white,
+                        borderColor: habit.timerElapsedPercent >= 1.0 ? Colors.green.withOpacity(0.2) : AppColors.primary,
                       ),
                     ),
                     12.sbw(context),
@@ -261,9 +271,9 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                         onTap: () => showDeleteDialog(
                             context,widget.habitIndex ),
                         text: "delete".tr(),
-                        color: themeCubit.greyColor,
+                        color: themeCubit.greyColor.withOpacity(.1),
                         textColor: themeCubit.textColor,
-                        borderColor: Colors.transparent,
+                        borderColor:  themeCubit.greyColor, 
                         height: resp.hp(50),
                       ),
                     ),

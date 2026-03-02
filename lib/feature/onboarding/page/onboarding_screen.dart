@@ -9,6 +9,7 @@ import 'package:attention_anchor/common/common_widget/custom_button.dart';
 import 'package:attention_anchor/feature/bottom_nav/page/bottomnav_page.dart';
 import 'package:attention_anchor/feature/onboarding/cubit/onboarding_cubit.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
+import 'package:attention_anchor/feature/onboarding/cubit/onboarding_state.dart';
 import 'package:attention_anchor/theme/app_colors.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:attention_anchor/common/common_widget/main_background.dart';
@@ -74,8 +75,8 @@ class OnboardingScreen extends StatelessWidget {
 
                   16.sbh(context),
 
-                  BlocBuilder<OnboardingCubit, int>(
-                    builder: (context, selectedIndex) {
+                  BlocBuilder<OnboardingCubit, OnboardingState>(
+                    builder: (context, state) {
                       return ListView.builder(
                         itemCount: onboardingOptions.length,
                         shrinkWrap: true,
@@ -83,7 +84,7 @@ class OnboardingScreen extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: resp.wp(20)),
                         itemBuilder: (context, index) {
                           final option = onboardingOptions[index];
-                          final isSelected = selectedIndex == index;
+                          final isSelected = state.selectedOption == index;
 
                           return CustomContainer(
                             width: resp.wp(335),
@@ -176,12 +177,13 @@ class OnboardingScreen extends StatelessWidget {
                     builder: (context) {
                       return CustomButton(
                         onTap: () {
-                          final finalSelection = context.read<OnboardingCubit>().state;
-                          print("Final selection: $finalSelection");
-                                 Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) =>  BottomNavigationBarScreen()),
-      );
-                          
+                          // Mark onboarding as complete in persistent storage
+                          context.read<OnboardingCubit>().completeOnboarding();
+
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (_) => const BottomNavigationBarScreen()),
+                            (route) => false,
+                          );
                         },
                         text: "continue".tr(),
                         width: resp.wp(350),

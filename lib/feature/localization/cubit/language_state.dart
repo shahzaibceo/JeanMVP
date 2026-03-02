@@ -4,17 +4,20 @@ class LanguageState extends Equatable {
   final String selectedLanguage;
   final String selectedLanguageCode; // Added language code
   final String searchQuery;
+  final bool isInitialSetupFinished;
 
   const LanguageState({
     required this.selectedLanguage,
     required this.selectedLanguageCode,
     required this.searchQuery,
+    this.isInitialSetupFinished = false,
   });
 
   LanguageState copyWith({
     String? selectedLanguage,
     String? selectedLanguageCode,
     String? searchQuery,
+    bool? isInitialSetupFinished,
   }) {
     return LanguageState(
       selectedLanguage: selectedLanguage ?? this.selectedLanguage,

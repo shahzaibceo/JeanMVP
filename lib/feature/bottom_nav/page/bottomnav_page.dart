@@ -6,6 +6,7 @@ import 'package:attention_anchor/common/extensions/sized_box.dart';
 import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
 import 'package:attention_anchor/feature/bottom_nav/cubit/bottom_cubit.dart';
 import 'package:attention_anchor/feature/dashboard/page/dashboard_screen.dart';
+import 'package:attention_anchor/feature/habit_creation/page/habit_list_screen.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
 import 'package:attention_anchor/feature/settings/pages/setting_page.dart';
 import 'package:attention_anchor/theme/app_colors.dart';
@@ -27,7 +28,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> w
   List<Widget> _buildScreens() {
     return [
       const DashboardScreen(),
-      const SettingsScreen(),
+      const HabitsListScreen(),
       const SettingsScreen(),
     ];
   }
@@ -38,9 +39,9 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> w
     final resp = ResponsiveHelper(context);
 
     final List<Map<String, dynamic>> _navItems = [
-      {'icon': AppIcons.home, 'label': "Home".tr()},
-      {'icon': AppIcons.streak, 'label': "Streak".tr()},
-      {'icon': AppIcons.setting, 'label': "Settings".tr()},
+      {'icon': AppIcons.home, 'label': "home".tr()},
+      {'icon': AppIcons.streak, 'label': "streak".tr()},
+      {'icon': AppIcons.setting, 'label': "settings".tr()},
     ];
 
     double barWidth = MediaQuery.of(context).size.width - 40;

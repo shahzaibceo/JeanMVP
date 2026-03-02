@@ -82,6 +82,8 @@ class NotificationHelper {
             title: 'Habit Reminder',
             body: 'It\'s time for: $title',
             notificationLayout: NotificationLayout.Default,
+            category: NotificationCategory.Reminder,
+            wakeUpScreen: true,
           ),
           schedule: NotificationCalendar(
             weekday: _weekdayFromString(day),
@@ -95,7 +97,7 @@ class NotificationHelper {
             timeZone: tz,
           ),
         );
-        print('Scheduled notification for $title on $day at $hour:$minute - Result: $result');
+        print('Scheduled notification for $title on $day at $hour:$minute in $tz - Result: $result');
       }
     } catch (e) {
       print('Error scheduling notification: $e');

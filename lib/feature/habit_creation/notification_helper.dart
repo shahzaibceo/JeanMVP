@@ -1,9 +1,5 @@
-
-
-
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:attention_anchor/theme/app_colors.dart';
-import 'package:flutter/material.dart';
 
 class NotificationHelper {
   static const String channelKey = 'habit_reminder_channel';
@@ -25,7 +21,7 @@ class NotificationHelper {
             criticalAlerts: true,
             playSound: true,
             enableVibration: true,
-            ledColor: Colors.white,
+            ledColor: AppColors.white,
           ),
         ],
         debug: true,
@@ -51,7 +47,6 @@ class NotificationHelper {
           NotificationPermission.Badge,
           NotificationPermission.Vibration,
           NotificationPermission.Light,
-          // NotificationPermission.PreciseAlarm,
           
         ],
       );
@@ -60,8 +55,6 @@ class NotificationHelper {
 
   /// Generate a unique and deterministic ID for each habit+day
   static int notificationId(String habitName, String day) {
-    // Deterministic hash based on habitName and day
-    // This ensures we can update/cancel specific notifications consistently
     return (habitName.toLowerCase().hashCode ^ day.toLowerCase().hashCode).abs() & 0x7FFFFFFF;
   }
 
@@ -102,7 +95,7 @@ class NotificationHelper {
           id: id,
           channelKey: channelKey,
           title: 'Habit Reminder',
-          body: 'It\'s time for: $habitName',
+          body: 'It\'s time for $habitName',
           notificationLayout: NotificationLayout.Default,
           category: NotificationCategory.Reminder,
           wakeUpScreen: true,

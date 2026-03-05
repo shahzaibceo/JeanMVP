@@ -10,6 +10,8 @@ import 'package:attention_anchor/common/utils/responsive_helper/responsive_helpe
 import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';
 import 'package:attention_anchor/feature/habit_creation/page/habit_creation_screen.dart';
 import 'package:attention_anchor/feature/habit_creation/page/habit_detail_screen.dart';
+import 'package:attention_anchor/feature/history/page/history_screen.dart';
+import 'package:attention_anchor/feature/stats/page/stats_screen.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart'; // Localization import
 import 'package:attention_anchor/theme/app_colors.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
@@ -28,21 +30,40 @@ class HabitsListScreen extends StatelessWidget {
     return MainBackground(
       appBar: AppBarWidget(
         showBack: true,
-        title: "habits".tr(), 
+        title: "habits".tr(),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HistoryScreen()),
+              );
+            },
+            icon: Icon(Icons.history, color: themeCubit.textColor),
+          ),
+        ],
       ),
       child: Stack(
         children: [
           BlocBuilder<HabitCubit, HabitState>(
             builder: (context, state) {
               return ListView.builder(
-                padding: EdgeInsets.fromLTRB(resp.wp(15), resp.hp(12), resp.wp(15), resp.hp(100)),
+                padding: EdgeInsets.fromLTRB(
+                  resp.wp(15),
+                  resp.hp(12),
+                  resp.wp(15),
+                  resp.hp(100),
+                ),
                 itemCount: state.habits.length,
                 itemBuilder: (context, index) {
                   final habit = state.habits[index];
                   return CustomContainer(
                     margin: EdgeInsets.only(bottom: resp.hp(16)),
-                    padding: EdgeInsets.symmetric(horizontal:  resp.wp(20),vertical: resp.hp(12)),
-                     border: Border.all(color: themeCubit.greyColor, width: 0.1)  ,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: resp.wp(20),
+                      vertical: resp.hp(12),
+                    ),
+                    border: Border.all(color: themeCubit.greyColor, width: 0.1),
                     borderRadius: resp.radius(20),
                     color: themeCubit.containerColor,
                     child: Column(
@@ -51,77 +72,93 @@ class HabitsListScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                             CustomText(
-                               text: habit.name,
-                               style:Theme.of(context).textTheme.titleSmall?.copyWith(
-                     color:   themeCubit.textColor,
-                     fontWeight: FontWeight.w600
-                   ),
-                             ),
-                             CustomContainer(
-                               height: resp.hp(42),
-                               width: resp.wp(42),
-                               borderRadius: resp.radius(10),
-                               color: AppColors.primary.withOpacity(0.1),
-                               child: Center(
-                                 child: SvgPicture.asset(
-                                   AppIcons.icon,
-                                   width: resp.wp(22),
-                                   height: resp.hp(22),
-                                   colorFilter: ColorFilter.mode(
-                                     AppColors.primary, 
-                                     BlendMode.srcIn,
-                                   ),
-                                 ),
-                               ),
-                             ),
-                           ],
-                         ),
-                         4.sbh(context),
+                            CustomText(
+                              text: habit.name,
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(
+                                    color: themeCubit.textColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                            CustomContainer(
+                              height: resp.hp(42),
+                              width: resp.wp(42),
+                              borderRadius: resp.radius(10),
+                              color: AppColors.primary.withOpacity(0.1),
+                              child: Center(
+                                child: SvgPicture.asset(
+                                  AppIcons.icon,
+                                  width: resp.wp(22),
+                                  height: resp.hp(22),
+                                  colorFilter: ColorFilter.mode(
+                                    AppColors.primary,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        4.sbh(context),
                         Row(
                           children: [
-                             const Icon(Icons.timer, color: AppColors.primary, size: 18),
-                    4.sbw(context),
+                            const Icon(
+                              Icons.timer,
+                              color: AppColors.primary,
+                              size: 18,
+                            ),
+                            4.sbw(context),
 
-                             CustomText(
-                           text: habit.timerDuration,
-                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                             color: themeCubit.textColor,
-                             fontWeight: FontWeight.w500,
-                           ),
-                         ),
+                            CustomText(
+                              text: habit.timerDuration,
+                              style: Theme.of(context).textTheme.bodyLarge
+                                  ?.copyWith(
+                                    color: themeCubit.textColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                            ),
                           ],
-                        ) ,
-                        
-                         Row(
-                           children: [
-                             Icon(Icons.local_fire_department,
-                                 color: habit.streak > 0 
-                                     ? Colors.green 
-                                     : (habit.lastCompletedDate == null ? Colors.grey : Colors.red), 
-                                 size: 16),
-                             4.sbw(context),
-                             CustomText(
-                               text: habit.streak > 0
-                                   ? "${habit.streak} ${"day_streak".tr()}"
-                                   : (habit.lastCompletedDate == null ? "0 ${"day_streak".tr()}" : "end_streak".tr()),
-                               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                     color: habit.streak > 0 
-                                         ? Colors.green 
-                                         : (habit.lastCompletedDate == null ? Colors.grey : Colors.red),
-                                     fontWeight: FontWeight.w500,
-                                   ),
-                             ),
-                           ],
-                         ),
-                   
+                        ),
+
+                        Row(
+                          children: [
+                            SvgPicture.asset(
+                              AppIcons.streakIcon,
+                              color: habit.streak > 0
+                                  ? Colors.green
+                                  : (habit.lastCompletedDate == null
+                                        ? Colors.grey
+                                        : Colors.red),
+                              height: resp.hp(16),
+                              width: resp.wp(16),
+                            ),
+                            4.sbw(context),
+                            CustomText(
+                              text: habit.streak > 0
+                                  ? "${habit.streak} ${"day_streak".tr()}"
+                                  : (habit.lastCompletedDate == null
+                                        ? "0 ${"day_streak".tr()}"
+                                        : "end_streak".tr()),
+                              style: Theme.of(context).textTheme.bodyLarge
+                                  ?.copyWith(
+                                    color: habit.streak > 0
+                                        ? Colors.green
+                                        : (habit.lastCompletedDate == null
+                                              ? Colors.grey
+                                              : Colors.red),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ).onTap(() {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => HabitDetailsScreen(habitIndex: index),
+                        builder: (context) =>
+                            HabitDetailsScreen(habitIndex: index),
                       ),
                     );
                   });
@@ -142,12 +179,12 @@ class HabitsListScreen extends StatelessWidget {
                   size: 22,
                 ),
                 onTap: () {
-                 Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HabitCreationView(),
-                      ),
-                    );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => HabitCreationView(),
+                    ),
+                  );
                 },
                 text: "add_new".tr(),
                 height: resp.hp(56),

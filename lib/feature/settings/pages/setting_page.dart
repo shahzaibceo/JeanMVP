@@ -7,6 +7,7 @@ import 'package:attention_anchor/common/extensions/padding_extension.dart';
 import 'package:attention_anchor/common/extensions/sized_box.dart';
 import 'package:attention_anchor/common/services/analytics_services.dart';
 import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
+import 'package:attention_anchor/feature/history/page/history_screen.dart';
 import 'package:attention_anchor/feature/localization/cubit/language_cubit.dart';
 import 'package:attention_anchor/feature/localization/cubit/language_state.dart';
 import 'package:attention_anchor/feature/localization/page/localization_page.dart';
@@ -53,8 +54,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: 'language'.tr(),
               trailing: BlocBuilder<LanguageCubit, LanguageState>(
                 builder: (context, state) {
+                  return SizedBox(
+                    width: resp.wp(120),
+                    child: CustomText(
+                      textAlign: TextAlign.end,
+                      maxLines:1 ,
+                      overflow: true,
+                      text: state.selectedLanguageCode.tr(),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: themeCubit.unselectedColor,
+                          ),
+                    ),
+                  );
+                },
+              ),
+              context: context,
+              onTap: () {
+                AnalyticsService.logEvent("language_selected_clicked");
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const SelectLanguageScreen(showBackButton: true)),
+                );
+              },
+            ).withSymmetricPadding(horizontal: resp.wp(20)),
+
+ buildSettingTile(
+              iconPath: AppIcons.language,
+              title: 'history'.tr(),
+              trailing: BlocBuilder<LanguageCubit, LanguageState>(
+                builder: (context, state) {
                   return CustomText(
-                    text: state.selectedLanguage.split(' ').first,
+                    text: "view".tr(),
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w500,
                           color: themeCubit.unselectedColor,
@@ -64,9 +94,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               context: context,
               onTap: () {
-                AnalyticsService.logEvent("language_selected_clicked");
+                AnalyticsService.logEvent("history_selected_clicked");
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SelectLanguageScreen(showBackButton: true)),
+                  MaterialPageRoute(builder: (_) => const HistoryScreen()),
                 );
               },
             ).withSymmetricPadding(horizontal: resp.wp(20)),
@@ -98,12 +128,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: 'appearance'.tr(),
               trailing: BlocBuilder<ThemeCubit, ThemeState>(
                 builder: (context, state) {
-                  return CustomText(
-                    text: state.mode.trKey.tr(),
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: themeCubit.unselectedColor,
-                        ),
+                  return SizedBox(
+                    width: resp.wp(100),
+                    child: CustomText(
+                        textAlign: TextAlign.end,
+                        maxLines:1 ,
+                        overflow: true,
+                      text: state.mode.trKey.tr(),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: themeCubit.unselectedColor,
+                          ),
+                    ),
                   );
                 },
               ),
@@ -231,9 +267,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
               20.sbh(context),
-              _buildThemeOption(context, 'system_default'.tr(), AppThemeMode.system, themeCubit, resp),
-              _buildThemeOption(context, 'light_mode'.tr(), AppThemeMode.light, themeCubit, resp),
-              _buildThemeOption(context, 'dark_mode'.tr(), AppThemeMode.dark, themeCubit, resp),
+              _buildThemeOption(context, 'system'.tr(), AppThemeMode.system, themeCubit, resp),
+              _buildThemeOption(context, 'light'.tr(), AppThemeMode.light, themeCubit, resp),
+              _buildThemeOption(context, 'dark'.tr(), AppThemeMode.dark, themeCubit, resp),
             ],
           ),
         ),

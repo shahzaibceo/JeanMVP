@@ -1,98 +1,100 @@
+import 'package:attention_anchor/common/common_widget/custom_conrtainer.dart';
+import 'package:attention_anchor/common/common_widget/custom_text.dart';
+import 'package:attention_anchor/common/constants/image_strings/app_icons.dart';
+import 'package:attention_anchor/common/extensions/sized_box.dart';
+import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
+import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';
+import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
+import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import '../../../common/common_widget/custom_conrtainer.dart';
-import '../../../common/common_widget/custom_text.dart';
-import '../../../common/extensions/sized_box.dart';
-import '../../../common/utils/responsive_helper/responsive_helper.dart';
-import '../../../theme/cubit/theme_cubit.dart';
-
-// Note: This model is here for UI demonstration. 
-// You can move it or replace it with your own logic.
-class HistoryItem {
-  final String habitName;
-  final String status; // "Ends" or "In Process"
-  final String streakInfo; // "Streak End" or "X Days Streak"
-  final DateTime date;
-
-  HistoryItem({
-    required this.habitName,
-    required this.status,
-    required this.streakInfo,
-    required this.date,
-  });
-}
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 class HistoryCard extends StatelessWidget {
-  final HistoryItem item;
-  final ResponsiveHelper resp;
-  final ThemeCubit themeCubit;
-
-  const HistoryCard({
-    super.key,
-    required this.item,
-    required this.resp,
-    required this.themeCubit,
-  });
+  final HabitModel habit;
+  const HistoryCard({super.key, required this.habit});
 
   @override
   Widget build(BuildContext context) {
-    final bool isEnded = item.status == "Ends";
-    final Color statusColor = isEnded ? Colors.redAccent : const Color(0xFF00FFA3);
-    final String dateStr = DateFormat('dd-MMM-yyyy').format(item.date);
+    final themeCubit = context.watch<ThemeCubit>();
+    final resp = ResponsiveHelper(context);
+
+    final bool isEnded = habit.streak == 0 && habit.lastCompletedDate != null;
+    final String statusText = isEnded ? "ended".tr() : "in_process".tr();
+    final Color statusColor = isEnded ? Colors.red : Colors.green;
+
+    String dateStr = "";
+    if (habit.lastCompletedDate != null) {
+        try {
+            final date = DateTime.parse(habit.lastCompletedDate!);
+            final months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+            dateStr = "${date.day}-${months[date.month - 1].tr()}-${date.year}";
+        } catch (e) {
+            dateStr = habit.lastCompletedDate!;
+        }
+    } else {
+        final date = DateTime.fromMillisecondsSinceEpoch(habit.createdAt);
+        final months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+        dateStr = "${date.day}-${months[date.month - 1].tr()}-${date.year}";
+    }
 
     return CustomContainer(
-      margin: EdgeInsets.only(bottom: resp.hp(12)),
+      margin: EdgeInsets.only(bottom: resp.hp(16)),
       padding: EdgeInsets.symmetric(horizontal: resp.wp(20), vertical: resp.hp(16)),
-      borderRadius: resp.radius(24),
-      color: themeCubit.containerColor,
       border: Border.all(color: themeCubit.greyColor.withOpacity(0.1), width: 1),
+      borderRadius: resp.radius(20),
+      color: themeCubit.containerColor,
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               CustomText(
-                text: item.habitName,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: themeCubit.textColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+                text: habit.name,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: themeCubit.textColor,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               CustomText(
-                text: item.status,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: statusColor,
-                      fontWeight: FontWeight.w600,
-                    ),
+                text: statusText,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: statusColor,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ],
           ),
-          8.sbh(context),
+          5.sbh(context),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.whatshot,
-                    color: statusColor,
-                    size: resp.wp(18),
+                  SvgPicture.asset(
+                    AppIcons.streakIcon,
+                    color: isEnded ? Colors.red : Colors.green,
+                    height: resp.hp(18),
+                    width: resp.wp(18),
                   ),
                   4.sbw(context),
                   CustomText(
-                    text: item.streakInfo,
+                    text: isEnded 
+                        ? "end_streak".tr() 
+                        : "${habit.streak} ${"day_streak".tr()}",
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: statusColor,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      color: isEnded ? Colors.red : Colors.green,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
               CustomText(
                 text: dateStr,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: themeCubit.unselectedColor.withOpacity(0.6),
-                    ),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: themeCubit.textColor.withOpacity(0.6),
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ],
           ),

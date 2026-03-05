@@ -1,5 +1,3 @@
-
-
 import 'package:attention_anchor/feature/habit_creation/widget/habit_creation_widget.dart/build_weekly_days.dart';
 import 'package:attention_anchor/feature/habit_creation/widget/habit_creation_widget.dart/name_field_widget.dart';
 import 'package:attention_anchor/feature/habit_creation/widget/habit_creation_widget.dart/selection_header.dart';
@@ -38,7 +36,15 @@ class _HabitCreationViewState extends State<HabitCreationView> {
   late TextEditingController _fromHours;
   late TextEditingController _fromMints;
 
-  final List<String> weekDays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+  final List<String> weekDays = [
+    'mon',
+    'tue',
+    'wed',
+    'thu',
+    'fri',
+    'sat',
+    'sun',
+  ];
 
   @override
   void initState() {
@@ -47,7 +53,9 @@ class _HabitCreationViewState extends State<HabitCreationView> {
   }
 
   void _initializeControllers() {
-    _nameController = TextEditingController(text: widget.habitToEdit?.name ?? "");
+    _nameController = TextEditingController(
+      text: widget.habitToEdit?.name ?? "",
+    );
 
     // Logic for splitting Reminder Time
     String timeStr = widget.habitToEdit?.time ?? "";
@@ -111,52 +119,61 @@ class _HabitCreationViewState extends State<HabitCreationView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               20.sbh(context),
-              SectionHeader(label: "habit_name".tr(), textColor: themeCubit.textColor,),
-              HabitNameField(controller: _nameController, themeCubit: themeCubit, resp: resp),
-              
+              SectionHeader(
+                label: "habit_name".tr(),
+                textColor: themeCubit.textColor,
+              ),
+              HabitNameField(
+                controller: _nameController,
+                themeCubit: themeCubit,
+                resp: resp,
+              ),
+
               24.sbh(context),
-              SectionHeader(label: "week_days".tr(), textColor: themeCubit.textColor, ),
-              WeekDaysSelector(weekDays: weekDays, habitCubit: habitCubit, themeCubit: themeCubit, resp: resp),
-              
+              SectionHeader(
+                label: "week_days".tr(),
+                textColor: themeCubit.textColor,
+              ),
+              WeekDaysSelector(
+                weekDays: weekDays,
+                habitCubit: habitCubit,
+                themeCubit: themeCubit,
+                resp: resp,
+              ),
+
               24.sbh(context),
-              SectionHeader(label: "set_timer".tr(), textColor: themeCubit.textColor,),
-              // buildTimerBox(
-              //   themeCubit: themeCubit,
-              //   resp: resp,
-              //   context: context,
-              //   hController: _timerHours,
-              //   mController: _timerMints,
-              // ),
+              SectionHeader(
+                label: "set_timer".tr(),
+                textColor: themeCubit.textColor,
+              ),
+
               TimerBox(
-  themeCubit: themeCubit,
-  resp: resp,
-  hController: _timerHours,
-  mController: _timerMints,
-),
-              
+                themeCubit: themeCubit,
+                resp: resp,
+                hController: _timerHours,
+                mController: _timerMints,
+              ),
+
               24.sbh(context),
-              // buildReminderSwitch(habitCubit, themeCubit, resp, context),
               ReminderSwitch(
-  habitCubit: habitCubit,
-  themeCubit: themeCubit,
-  resp: resp,
-),
-              
+                habitCubit: habitCubit,
+                themeCubit: themeCubit,
+                resp: resp,
+              ),
+
               if (habitCubit.state.isReminderOn) ...[
                 16.sbh(context),
-                // buildTimeInputCard(context, themeCubit, resp, _fromHours, _fromMints, 
-                //     habitCubit.state.fromPeriod, (val) => habitCubit.updatePeriod(val)),
 
                 TimeInputCard(
-  themeCubit: themeCubit,
-  resp: resp,
-  hController: _fromHours,
-  mController: _fromMints,
-  period: habitCubit.state.fromPeriod,
-  onPeriodChange:  (val) => habitCubit.updatePeriod(val)),
-
+                  themeCubit: themeCubit,
+                  resp: resp,
+                  hController: _fromHours,
+                  mController: _fromMints,
+                  period: habitCubit.state.fromPeriod,
+                  onPeriodChange: (val) => habitCubit.updatePeriod(val),
+                ),
               ],
-              
+
               40.sbh(context),
               _buildActionButton(resp, habitCubit),
               20.sbh(context),
@@ -171,17 +188,17 @@ class _HabitCreationViewState extends State<HabitCreationView> {
     bool isEdit = widget.habitToEdit != null;
     return Center(
       child: CustomContainer(
-         width: resp.wp(300),
+        width: resp.wp(300),
         height: resp.hp(56),
         borderRadius: resp.radius(18),
         color: AppColors.primary,
         child: Center(
           child: CustomText(
             text: (isEdit ? "update" : "save").tr(),
-            style:  Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w600
-                    ),
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: AppColors.white,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ).onTap(() => _handleSave(habitCubit)),
@@ -190,12 +207,16 @@ class _HabitCreationViewState extends State<HabitCreationView> {
 
   void _handleSave(HabitCubit habitCubit) {
     if (_nameController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("please_enter_habit_name".tr())));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("please_enter_habit_name".tr())));
       return;
     }
 
-    String timerDur = "${_timerHours.text.isEmpty ? "00" : _timerHours.text}:${_timerMints.text.isEmpty ? "00" : _timerMints.text}";
-    String reminderTime = "${_fromHours.text.isEmpty ? "00" : _fromHours.text}:${_fromMints.text.isEmpty ? "00" : _fromMints.text} ${habitCubit.state.fromPeriod}";
+    String timerDur =
+        "${_timerHours.text.isEmpty ? "00" : _timerHours.text}:${_timerMints.text.isEmpty ? "00" : _timerMints.text}";
+    String reminderTime =
+        "${_fromHours.text.isEmpty ? "00" : _fromHours.text}:${_fromMints.text.isEmpty ? "00" : _fromMints.text} ${habitCubit.state.fromPeriod}";
 
     if (widget.habitToEdit != null) {
       final updatedHabit = widget.habitToEdit!.copyWith(
@@ -215,7 +236,10 @@ class _HabitCreationViewState extends State<HabitCreationView> {
         period: habitCubit.state.fromPeriod,
         timerDuration: timerDur,
       );
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HabitsListScreen()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HabitsListScreen()),
+      );
     }
   }
 }

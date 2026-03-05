@@ -1,4 +1,3 @@
-
 import 'package:attention_anchor/common/common_widget/app_bar.dart';
 import 'package:attention_anchor/common/common_widget/custom_button.dart';
 import 'package:attention_anchor/common/common_widget/custom_conrtainer.dart';
@@ -12,13 +11,12 @@ import 'package:attention_anchor/common/utils/responsive_helper/responsive_helpe
 import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';
 import 'package:attention_anchor/feature/habit_creation/page/habit_creation_screen.dart';
 import 'package:attention_anchor/feature/habit_creation/widget/habit_detail_widget/dialog_box_widget.dart';
-import 'package:attention_anchor/feature/localization/translation/app_translation.dart'; 
+import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
 import 'package:attention_anchor/theme/app_colors.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 
 class HabitDetailsScreen extends StatefulWidget {
   final int habitIndex;
@@ -61,27 +59,37 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
   String _formatDate(int timestamp) {
     final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
     final months = [
-      "jan".tr(), "feb".tr(), "mar".tr(), "apr".tr(), "may".tr(), "jun".tr(),
-      "jul".tr(), "aug".tr(), "sep".tr(), "oct".tr(), "nov".tr(), "dec".tr()
+      "jan".tr(),
+      "feb".tr(),
+      "mar".tr(),
+      "apr".tr(),
+      "may".tr(),
+      "jun".tr(),
+      "jul".tr(),
+      "aug".tr(),
+      "sep".tr(),
+      "oct".tr(),
+      "nov".tr(),
+      "dec".tr(),
     ];
     return "${date.day} ${months[date.month - 1]}, ${date.year}";
   }
 
-
   @override
   Widget build(BuildContext context) {
     final themeCubit = context.watch<ThemeCubit>();
-    final habitCubit = context.watch<HabitCubit>(); 
+    final habitCubit = context.watch<HabitCubit>();
     final resp = ResponsiveHelper(context);
-    
+
     // Get habit directly from index - always in sync with cubit state
-    if (widget.habitIndex < 0 || widget.habitIndex >= habitCubit.state.habits.length) {
+    if (widget.habitIndex < 0 ||
+        widget.habitIndex >= habitCubit.state.habits.length) {
       return Scaffold(
         appBar: AppBar(title: Text('error'.tr())),
         body: Center(child: Text('habit_not_found'.tr())),
       );
     }
-    
+
     final habit = habitCubit.state.habits[widget.habitIndex];
     final totalDuration = _parseDuration(habit.timerDuration);
 
@@ -92,26 +100,27 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
         actions: [
           Padding(
             padding: EdgeInsets.only(right: resp.wp(16)),
-            child: Center(
-              child: CustomText(
-                text: "edit".tr(),
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            child:
+                Center(
+                  child: CustomText(
+                    text: "edit".tr(),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w400,
                     ),
-              ),
-            ).onTap(() {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HabitCreationView(
-                    habitToEdit: habit,
-                    index: widget.habitIndex,
                   ),
-                ),
-              );
-            }),
-          )
+                ).onTap(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => HabitCreationView(
+                        habitToEdit: habit,
+                        index: widget.habitIndex,
+                      ),
+                    ),
+                  );
+                }),
+          ),
         ],
       ),
       child: Column(
@@ -121,50 +130,58 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
           SizedBox(
             height: resp.hp(200),
             width: resp.hp(200),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  height: resp.hp(210),
-                  width: resp.hp(210),
-                  child: CircularProgressIndicator(
-                    value: habit.timerElapsedPercent,
-                    strokeWidth: 8,
-                    color: AppColors.primary,
-                    backgroundColor: themeCubit.greyColor.withOpacity(0.3),
-                  ),
-                ),
-                CustomText(
-                  text: habit.timerElapsedPercent >= 1.0 
-                      ? "completed".tr() 
-                      : (habit.timerIsRunning
-                          ? "${(habit.timerElapsedPercent * 100).toStringAsFixed(0)}%"
-                          : (habit.timerElapsedPercent > 0 ? "resume".tr() : "start".tr())),
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: themeCubit.textColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: habit.timerElapsedPercent >= 1.0 ? resp.hp(32) : null,
+            child:
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      height: resp.hp(210),
+                      width: resp.hp(210),
+                      child: CircularProgressIndicator(
+                        value: habit.timerElapsedPercent,
+                        strokeWidth: 8,
+                        color: AppColors.primary,
+                        backgroundColor: themeCubit.greyColor.withValues(
+                          alpha: 0.3,
+                        ),
                       ),
-                ).withSymmetricPadding(horizontal: resp.wp(12)),
-              ],
-            ).onTap((){
-                    if (habit.timerElapsedPercent >= 1.0) return; // Disable if completed
-                    if (habit.timerIsRunning) {
-                      habitCubit.pauseTimer(widget.habitIndex);
-                    } else {
-                      habitCubit.startTimer(widget.habitIndex, totalDuration);
-                    }
-                  
-            }),
+                    ),
+                    CustomText(
+                      text: habit.timerElapsedPercent >= 1.0
+                          ? "completed".tr()
+                          : (habit.timerIsRunning
+                                ? "${(habit.timerElapsedPercent * 100).toStringAsFixed(0)}%"
+                                : (habit.timerElapsedPercent > 0
+                                      ? "resume".tr()
+                                      : "start".tr())),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(
+                            color: themeCubit.textColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: habit.timerElapsedPercent >= 1.0
+                                ? resp.hp(32)
+                                : null,
+                          ),
+                    ).withSymmetricPadding(horizontal: resp.wp(12)),
+                  ],
+                ).onTap(() {
+                  if (habit.timerElapsedPercent >= 1.0)
+                    return; // Disable if completed
+                  if (habit.timerIsRunning) {
+                    habitCubit.pauseTimer(widget.habitIndex);
+                  } else {
+                    habitCubit.startTimer(widget.habitIndex, totalDuration);
+                  }
+                }),
           ),
-20.sbh(context),
+          20.sbh(context),
           if (habit.timerElapsedPercent >= 1.0)
             CustomText(
               text: "completion_quote".tr(),
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+              ),
               textAlign: TextAlign.center,
             ).withSymmetricPadding(horizontal: resp.wp(24)),
 
@@ -185,16 +202,19 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                     CustomText(
                       text: habit.name,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: themeCubit.textColor,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        color: themeCubit.textColor,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     CustomContainer(
                       height: resp.hp(40),
                       width: resp.hp(40),
-                      border: Border.all(color: themeCubit.greyColor, width: 0.1),
+                      border: Border.all(
+                        color: themeCubit.greyColor,
+                        width: 0.1,
+                      ),
                       borderRadius: resp.radius(10),
-                      color: AppColors.primary.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       child: Center(
                         child: SvgPicture.asset(
                           AppIcons.icon,
@@ -210,24 +230,34 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                   ],
                 ),
                 4.sbh(context),
-                 Row(
+                Row(
                   children: [
-                    Icon(Icons.local_fire_department,
-                        color: habit.streak > 0 
-                            ? Colors.green 
-                            : (habit.lastCompletedDate == null ? Colors.grey : Colors.red),
-                        size: 18),
+                    SvgPicture.asset(
+                      AppIcons.streakIcon,
+                      color: habit.streak > 0
+                          ? Colors.green
+                          : (habit.lastCompletedDate == null
+                                ? Colors.grey
+                                : Colors.red),
+                      height: resp.hp(16),
+                      width: resp.wp(16),
+                    ),
+
                     4.sbw(context),
                     CustomText(
                       text: habit.streak > 0
                           ? "${habit.streak} ${"day_streak".tr()}"
-                          : (habit.lastCompletedDate == null ? "0 ${"day_streak".tr()}" : "end_streak".tr()),
+                          : (habit.lastCompletedDate == null
+                                ? "0 ${"day_streak".tr()}"
+                                : "end_streak".tr()),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: habit.streak > 0 
-                                ? Colors.green 
-                                : (habit.lastCompletedDate == null ? Colors.grey : Colors.red),
-                            fontWeight: FontWeight.w600,
-                          ),
+                        color: habit.streak > 0
+                            ? Colors.green
+                            : (habit.lastCompletedDate == null
+                                  ? Colors.grey
+                                  : Colors.red),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -249,15 +279,17 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                 CustomText(
                   text: "history".tr(),
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: themeCubit.textColor,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: themeCubit.textColor,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 5.sbh(context),
 
-                  CustomText(
-                  text: "${"starts_from".tr()} ${_formatDate(habit.createdAt)}", 
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: themeCubit.unselectedColor),
+                CustomText(
+                  text: "${"starts_from".tr()} ${_formatDate(habit.createdAt)}",
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: themeCubit.unselectedColor,
+                  ),
                 ),
                 20.sbh(context),
                 Row(
@@ -270,33 +302,47 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                           if (habit.timerIsRunning) {
                             habitCubit.pauseTimer(widget.habitIndex);
                           } else {
-                            habitCubit.startTimer(widget.habitIndex, totalDuration);
+                            habitCubit.startTimer(
+                              widget.habitIndex,
+                              totalDuration,
+                            );
                           }
                         },
-                        text: habit.timerElapsedPercent >= 1.0 
-                            ? "completed".tr() 
-                            : (habit.timerIsRunning ? "pause".tr() : (habit.timerElapsedPercent > 0 ? "resume".tr() : "start".tr())),
+                        text: habit.timerElapsedPercent >= 1.0
+                            ? "completed".tr()
+                            : (habit.timerIsRunning
+                                  ? "pause".tr()
+                                  : (habit.timerElapsedPercent > 0
+                                        ? "resume".tr()
+                                        : "start".tr())),
                         height: resp.hp(50),
-                        color: habit.timerElapsedPercent >= 1.0 ? Colors.green.withOpacity(0.2) : AppColors.primary,
-                        textColor: habit.timerElapsedPercent >= 1.0 ? Colors.green : AppColors.white,
-                        borderColor: habit.timerElapsedPercent >= 1.0 ? Colors.green.withOpacity(0.2) : AppColors.primary,
+                        color: habit.timerElapsedPercent >= 1.0
+                            ? Colors.green.withValues(alpha: 0.2)
+                            : AppColors.primary,
+                        textColor: habit.timerElapsedPercent >= 1.0
+                            ? Colors.green
+                            : AppColors.white,
+                        borderColor: habit.timerElapsedPercent >= 1.0
+                            ? Colors.green.withValues(alpha: 0.2)
+                            : AppColors.primary,
                       ),
                     ),
                     12.sbw(context),
                     Expanded(
                       child: CustomButton(
                         borderRadius: resp.radius(12),
-                        onTap: () => showDeleteDialog(
-                            context,widget.habitIndex ),
+                        onTap: () =>
+                            showDeleteDialog(context, widget.habitIndex),
                         text: "delete".tr(),
-                        color: themeCubit.greyColor.withValues(alpha:.1),
+                        color: themeCubit.greyColor.withValues(alpha: .1),
                         textColor: themeCubit.textColor,
-                       borderColor:  themeCubit.greyColor, width: 0.1,
+                        borderColor: themeCubit.greyColor,
+                        width: 0.1,
                         height: resp.hp(50),
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ).withSymmetricPadding(horizontal: resp.wp(16)),

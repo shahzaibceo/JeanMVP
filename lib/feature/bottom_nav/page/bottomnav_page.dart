@@ -9,6 +9,7 @@ import 'package:attention_anchor/feature/dashboard/page/dashboard_screen.dart';
 import 'package:attention_anchor/feature/habit_creation/page/habit_list_screen.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
 import 'package:attention_anchor/feature/settings/pages/setting_page.dart';
+import 'package:attention_anchor/feature/stats/page/stats_screen.dart';
 import 'package:attention_anchor/theme/app_colors.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> w
   List<Widget> _buildScreens() {
     return [
       const DashboardScreen(),
-      const HabitsListScreen(),
+      const StatsScreen(),
       const SettingsScreen(),
     ];
   }

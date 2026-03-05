@@ -1,5 +1,7 @@
+import 'package:attention_anchor/common/constants/image_strings/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../../common/common_widget/custom_button.dart';
 import '../../../common/common_widget/custom_conrtainer.dart';
@@ -97,11 +99,16 @@ class HabitCard extends StatelessWidget {
           /// STREAK
           Row(
             children: [
-              Icon(Icons.local_fire_department,
-                  color: habit.streak > 0 
-                      ? Colors.green 
-                      : (habit.lastCompletedDate == null ? Colors.grey : Colors.red),
-                  size: resp.wp(18)),
+               SvgPicture.asset(
+                    AppIcons.streakIcon,
+                     color: habit.streak > 0 
+                            ? Colors.green 
+                            : (habit.lastCompletedDate == null ? Colors.grey : Colors.red),
+                    height: resp.hp(16),
+                    width: resp.wp(16),
+                  ),
+                 
+            
               4.sbw(context),
               CustomText(
                 text: habit.streak > 0
@@ -162,33 +169,33 @@ class HabitCard extends StatelessWidget {
     );
   }
 
-  /// ---------- ACTION HANDLER ----------
-  void _handleAction(BuildContext context, bool isDone, bool isRunning) {
-    final cubit = context.read<HabitCubit>();
+  // /// ---------- ACTION HANDLER ----------
+  // void _handleAction(BuildContext context, bool isDone, bool isRunning) {
+  //   final cubit = context.read<HabitCubit>();
 
-    if (isDone) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => HabitDetailsScreen(habitIndex: index),
-        ),
-      );
-      return;
-    }
+  //   if (isDone) {
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(
+  //         builder: (_) => HabitDetailsScreen(habitIndex: index),
+  //       ),
+  //     );
+  //     return;
+  //   }
 
-    if (isRunning) {
-      cubit.pauseTimer(index);
-      return;
-    }
+  //   if (isRunning) {
+  //     cubit.pauseTimer(index);
+  //     return;
+  //   }
 
-    final parts = habit.timerDuration.split(':');
+  //   final parts = habit.timerDuration.split(':');
 
-    cubit.startTimer(
-      index,
-      Duration(
-        hours: int.parse(parts[0]),
-        minutes: int.parse(parts[1]),
-      ),
-    );
-  }
+  //   cubit.startTimer(
+  //     index,
+  //     Duration(
+  //       hours: int.parse(parts[0]),
+  //       minutes: int.parse(parts[1]),
+  //     ),
+  //   );
+  // }
 }

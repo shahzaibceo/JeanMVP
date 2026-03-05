@@ -16,8 +16,8 @@ class AppIcons {
   static String home = 'assets/icons/home.svg';
   static String streak = 'assets/icons/streak.svg';
   static String setting = 'assets/icons/setting.svg';
-  // static String settingFill = 'assets/icons/setting_fill.svg';
-  // static String homeFill = 'assets/icons/home_fill.svg';
+  static String history = 'assets/icons/history.svg';
+  static String streakIcon = 'assets/icons/streak_icon.svg';
   // static String delete = 'assets/icons/delete.svg';
   // static String edit = 'assets/icons/edit.svg';
   // static String energyscreen = 'assets/icons/energy_screen.svg';

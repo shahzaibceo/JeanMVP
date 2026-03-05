@@ -12,6 +12,7 @@ class HabitModel {
   final int? timerStartTime;
   final int? timerTotalDurationMs;
   final String? lastCompletedDate; // "YYYY-MM-DD"
+  final List<String> completedDates;
 
   HabitModel({
     required this.name, 
@@ -26,6 +27,7 @@ class HabitModel {
     this.timerStartTime,
     this.timerTotalDurationMs,
     this.lastCompletedDate,
+    this.completedDates = const [],
   });
 
   // Convert HabitModel to JSON
@@ -42,6 +44,7 @@ class HabitModel {
     'timerStartTime': timerStartTime,
     'timerTotalDurationMs': timerTotalDurationMs,
     'lastCompletedDate': lastCompletedDate,
+    'completedDates': completedDates,
   };
 
   // Create HabitModel from JSON
@@ -58,6 +61,7 @@ class HabitModel {
     timerStartTime: map['timerStartTime'],
     timerTotalDurationMs: map['timerTotalDurationMs'],
     lastCompletedDate: map['lastCompletedDate'],
+    completedDates: List<String>.from(map['completedDates'] ?? []),
   );
 
   HabitModel copyWith({
@@ -73,6 +77,7 @@ class HabitModel {
     int? timerStartTime,
     int? timerTotalDurationMs,
     String? lastCompletedDate,
+    List<String>? completedDates,
   }) {
     return HabitModel(
       name: name ?? this.name,
@@ -87,6 +92,7 @@ class HabitModel {
       timerStartTime: timerStartTime ?? this.timerStartTime,
       timerTotalDurationMs: timerTotalDurationMs ?? this.timerTotalDurationMs,
       lastCompletedDate: lastCompletedDate ?? this.lastCompletedDate,
+      completedDates: completedDates ?? this.completedDates,
     );
   }
 }
@@ -372,6 +378,9 @@ class HabitCubit extends HydratedCubit<HabitState> {
       timerIsRunning: false,
       timerStartTime: null,
       timerTotalDurationMs: null,
+      completedDates: habit.lastCompletedDate != todayStr 
+          ? [...habit.completedDates, todayStr] 
+          : habit.completedDates,
     );
     emit(state.copyWith(habits: updatedHabits));
     print("EMIT LOG: State updated for '${habit.name}'. New streak in state: ${updatedHabits[index].streak}");

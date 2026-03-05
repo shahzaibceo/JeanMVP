@@ -8,6 +8,7 @@ import 'package:attention_anchor/common/extensions/gesture_detector.dart';
 import 'package:attention_anchor/common/extensions/sized_box.dart';
 import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
 import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';
+import 'package:attention_anchor/feature/habit_creation/page/habit_creation_screen.dart';
 import 'package:attention_anchor/feature/habit_creation/page/habit_detail_screen.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart'; // Localization import
 import 'package:attention_anchor/theme/app_colors.dart';
@@ -34,13 +35,13 @@ class HabitsListScreen extends StatelessWidget {
           BlocBuilder<HabitCubit, HabitState>(
             builder: (context, state) {
               return ListView.builder(
-                padding: EdgeInsets.all(resp.wp(16)),
+                padding: EdgeInsets.fromLTRB(resp.wp(15), resp.hp(12), resp.wp(15), resp.hp(100)),
                 itemCount: state.habits.length,
                 itemBuilder: (context, index) {
                   final habit = state.habits[index];
                   return CustomContainer(
                     margin: EdgeInsets.only(bottom: resp.hp(16)),
-                    padding: EdgeInsets.all(resp.wp(16)),
+                    padding: EdgeInsets.symmetric(horizontal:  resp.wp(20),vertical: resp.hp(12)),
                      border: Border.all(color: themeCubit.greyColor, width: 0.1)  ,
                     borderRadius: resp.radius(20),
                     color: themeCubit.containerColor,
@@ -94,20 +95,26 @@ class HabitsListScreen extends StatelessWidget {
                         
                          Row(
                            children: [
-                             const Icon(Icons.local_fire_department,
-                                 color: Colors.green, size: 16),
+                             Icon(Icons.local_fire_department,
+                                 color: habit.streak > 0 
+                                     ? Colors.green 
+                                     : (habit.lastCompletedDate == null ? Colors.grey : Colors.red), 
+                                 size: 16),
                              4.sbw(context),
                              CustomText(
-                               text: "${habit.streak} ${"day_streak".tr()}",
-                               
+                               text: habit.streak > 0
+                                   ? "${habit.streak} ${"day_streak".tr()}"
+                                   : (habit.lastCompletedDate == null ? "0 ${"day_streak".tr()}" : "end_streak".tr()),
                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                     color:   Colors.green,
-                     fontWeight: FontWeight.w500
-                   ),
+                                     color: habit.streak > 0 
+                                         ? Colors.green 
+                                         : (habit.lastCompletedDate == null ? Colors.grey : Colors.red),
+                                     fontWeight: FontWeight.w500,
+                                   ),
                              ),
                            ],
                          ),
-                     
+                   
                       ],
                     ),
                   ).onTap(() {
@@ -123,7 +130,7 @@ class HabitsListScreen extends StatelessWidget {
             },
           ),
           Positioned(
-            bottom: resp.hp(30),
+            bottom: resp.hp(40),
             left: 0,
             right: 0,
             child: Center(
@@ -131,11 +138,16 @@ class HabitsListScreen extends StatelessWidget {
                 width: resp.wp(300),
                 suffixIcon: const Icon(
                   Icons.add_circle,
-                  color: Colors.white,
+                  color: AppColors.white,
                   size: 22,
                 ),
                 onTap: () {
-                  Navigator.pop(context);
+                 Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HabitCreationView(),
+                      ),
+                    );
                 },
                 text: "add_new".tr(),
                 height: resp.hp(56),

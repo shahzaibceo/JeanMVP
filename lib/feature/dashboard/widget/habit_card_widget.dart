@@ -11,6 +11,7 @@ import '../../../theme/cubit/theme_cubit.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
 import '../../habit_creation/cubit/habit_cubit.dart';
 import '../../habit_creation/page/habit_detail_screen.dart';
+import '../../habit_creation/widget/habit_detail_widget/dialog_box_widget.dart';
 
 class HabitCard extends StatelessWidget {
   final HabitModel habit;
@@ -33,20 +34,24 @@ class HabitCard extends StatelessWidget {
     final bool isRunning = habit.timerIsRunning;
 
     String statusText = "new".tr();
-    Color statusColor = AppColors.primary.withOpacity(.1);
+    Color statusColor = AppColors.primary.withValues(alpha:.1);
     Color statusTextColor = AppColors.primary;
 
     if (isDone) {
       statusText = "done".tr();
-      statusColor = Colors.green.withOpacity(.1);
+      statusColor = Colors.green.withValues(alpha:.1);
       statusTextColor = Colors.green;
     } else if (isRunning) {
       statusText = "running".tr();
-      statusColor = Colors.orange.withOpacity(.1);
+      statusColor = Colors.orange.withValues(alpha:.1);
       statusTextColor = Colors.orange;
+    } else if (habit.streak == 0 && habit.lastCompletedDate != null) {
+      statusText = "ended".tr();
+      statusColor = Colors.red.withValues(alpha:.1);
+      statusTextColor = Colors.red;
     } else if (!isNew) {
       statusText = "paused".tr();
-      statusColor = theme.greyColor.withOpacity(.1);
+      statusColor = theme.greyColor.withValues(alpha:.1);
       statusTextColor = theme.unselectedColor;
     }
 
@@ -93,14 +98,20 @@ class HabitCard extends StatelessWidget {
           Row(
             children: [
               Icon(Icons.local_fire_department,
-                  color: isNew ? Colors.grey : Colors.green,
+                  color: habit.streak > 0 
+                      ? Colors.green 
+                      : (habit.lastCompletedDate == null ? Colors.grey : Colors.red),
                   size: resp.wp(18)),
               4.sbw(context),
               CustomText(
-                text: isNew ? "new_start".tr() : "${habit.streak} ${"day_streak".tr()}",
+                text: habit.streak > 0
+                    ? "${habit.streak} ${"day_streak".tr()}"
+                    : (habit.lastCompletedDate == null ? "0 ${"day_streak".tr()}" : "end_streak".tr()),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: isNew ? theme.unselectedColor : Colors.green,
-                      fontWeight: FontWeight.w500,
+                      color: habit.streak > 0 
+                          ? Colors.green 
+                          : (habit.lastCompletedDate == null ?Colors.grey : Colors.red),
+                      fontWeight: FontWeight.w600,
                     ),
               ),
             ],
@@ -116,27 +127,32 @@ class HabitCard extends StatelessWidget {
                   height: resp.hp(48),
                   borderRadius: resp.radius(12),
                   textSize: resp.fontSize(16),
-                  text: isDone
-                      ? "view_details".tr()
-                      : (isRunning ? "pause".tr() : (isNew ? "start".tr() : "resume".tr())),
-                  onTap: () => _handleAction(context, isDone, isRunning),
+                  text: "view_details".tr(),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => HabitDetailsScreen(habitIndex: index),
+                      ),
+                    );
+                  },
                 ),
               ),
               12.sbw(context),
               Expanded(
                 child: CustomButton(
-                  borderColor:  theme.greyColor,
+                     borderColor:  theme.greyColor, width: 0.1,
                   height: resp.hp(48),
                   textSize: resp.fontSize(16),
                   borderRadius: resp.radius(12),
                   text: "skipped".tr(),
-                  color: isDone
-                      ? theme.greyColor.withOpacity(.05)
-                      : theme.greyColor.withOpacity(.1),
-                  textColor: isDone
-                      ? theme.greyColor.withOpacity(.5)
+                  color: (isDone || (habit.streak == 0 && habit.lastCompletedDate != null))
+                      ? theme.greyColor.withValues(alpha: .05)
+                      : theme.greyColor.withValues(alpha:.1),
+                  textColor: (isDone || (habit.streak == 0 && habit.lastCompletedDate != null))
+                      ? theme.greyColor.withValues(alpha:.5)
                       : theme.unselectedColor,
-                  onTap: isDone ? null : () {},
+                  onTap: (isDone || (habit.streak == 0 && habit.lastCompletedDate != null)) ? null : () => showSkipDialog(context, index),
                 ),
               ),
             ],

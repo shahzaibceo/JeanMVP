@@ -108,7 +108,7 @@ class TimeInputCard extends StatelessWidget {
                     color:   themeCubit.textColor,
                     fontWeight: FontWeight.w400,
                   ),),
-          8.sbw(context),
+         4 .sbw(context),
           SmallField(controller: hController, themeCubit: themeCubit, resp: resp),
 
           12.sbw(context),
@@ -116,7 +116,7 @@ class TimeInputCard extends StatelessWidget {
                     color:   themeCubit.textColor,
                     fontWeight: FontWeight.w400,
                   ),),
-          8.sbw(context),
+          4.sbw(context),
           SmallField(controller: mController, themeCubit: themeCubit, resp: resp),
 
           const Spacer(),
@@ -178,7 +178,7 @@ class RadioOption extends StatelessWidget {
         8.sbw(context),
         CustomText(
           text: value.tr(),
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: themeCubit.textColor,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               ),

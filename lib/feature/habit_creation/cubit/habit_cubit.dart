@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:attention_anchor/feature/habit_creation/notification_helper.dart';
 
@@ -138,7 +137,19 @@ class HabitState {
 
 class HabitCubit extends HydratedCubit<HabitState> {
   HabitCubit() : super(HabitState()) {
+    print("HabitCubit Initialized. Checking habits...");
     checkAndResetHabits();
+    // Refresh periodically to handle day transitions while app is open
+    _ticker = Timer.periodic(const Duration(minutes: 10), (_) {
+      print("Periodic Habit Refresh Triggered.");
+      checkAndResetHabits();
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _ticker?.cancel();
+    return super.close();
   }
 
   @override
@@ -165,13 +176,18 @@ class HabitCubit extends HydratedCubit<HabitState> {
     }
     final elapsedMs = DateTime.now().millisecondsSinceEpoch - habit.timerStartTime!;
     final percent = elapsedMs / habit.timerTotalDurationMs!;
+    // print("_calculateElapsedPercent: $elapsedMs / ${habit.timerTotalDurationMs} = $percent");
     return percent >= 1.0 ? 1.0 : percent;
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 
   // Update logic for day-specific streaks and resets
   void checkAndResetHabits() {
     final now = DateTime.now();
-    final todayStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    final todayStr = _formatDate(now);
     List<HabitModel> updatedHabits = List.from(state.habits);
     bool changed = false;
 
@@ -179,8 +195,9 @@ class HabitCubit extends HydratedCubit<HabitState> {
       final habit = updatedHabits[i];
       
       // Reset daily progress only if it's a scheduled day and not completed today
-      if (habit.lastCompletedDate != todayStr && _isDaySelected(habit, now)) {
+      if (habit.lastCompletedDate != todayStr && isDaySelected(habit, now)) {
         if (habit.timerElapsedPercent != 0.0 || habit.timerIsRunning) {
+          print("Resetting daily progress for habit: ${habit.name}");
           updatedHabits[i] = habit.copyWith(
             timerElapsedPercent: 0.0,
             timerIsRunning: false,
@@ -192,9 +209,12 @@ class HabitCubit extends HydratedCubit<HabitState> {
       }
 
       // Streak Reset Logic: Breaks only if a selected day was missed entirely
-      if (_shouldStreakReset(habit, now)) {
-        updatedHabits[i] = updatedHabits[i].copyWith(streak: 0);
-        changed = true;
+      if (_shouldStreakReset(updatedHabits[i], now)) {
+        if (habit.streak > 0) {
+          print("Streak reset to 0 for habit: ${habit.name} (missed scheduled day)");
+          updatedHabits[i] = updatedHabits[i].copyWith(streak: 0);
+          changed = true;
+        }
       }
     }
 
@@ -203,7 +223,7 @@ class HabitCubit extends HydratedCubit<HabitState> {
     }
   }
 
-  bool _isDaySelected(HabitModel habit, DateTime date) {
+  bool isDaySelected(HabitModel habit, DateTime date) {
     if (habit.days.isEmpty) return false;
     final Map<String, int> dayMap = {
       'mon': 1, 'tue': 2, 'wed': 3, 'thu': 4, 'fri': 5, 'sat': 6, 'sun': 7
@@ -214,7 +234,7 @@ class HabitCubit extends HydratedCubit<HabitState> {
   }
 
   bool _shouldStreakReset(HabitModel habit, DateTime now) {
-    if (habit.days.isEmpty) return false;
+    if (habit.days.isEmpty || habit.lastCompletedDate == null) return false;
     
     // Get numeric weekdays from habit.days (mon=1, sun=7)
     final Map<String, int> dayMap = {
@@ -225,20 +245,21 @@ class HabitCubit extends HydratedCubit<HabitState> {
     // Look back from yesterday to find the most recent selected day
     for (int d = 1; d <= 7; d++) {
       final checkDate = now.subtract(Duration(days: d));
-      final checkDateStr = "${checkDate.year}-${checkDate.month.toString().padLeft(2, '0')}-${checkDate.day.toString().padLeft(2, '0')}";
+      final checkDateStr = _formatDate(checkDate);
       
       if (selectedWeekdays.contains(checkDate.weekday)) {
-        // If this was a selected day, and it wasn't completed, streak breaks
+        // If this was a scheduled day, was it completed?
         if (habit.lastCompletedDate != checkDateStr) {
-            // But wait, if they completed it *after* that day (not possible with daily reset, but good to be safe)
-            // If the last completion is older than this missing mandatory day, streak is dead.
-            if (habit.lastCompletedDate == null) return true;
+            // Check if last completion was even earlier than this missed day
             final lastComp = DateTime.parse(habit.lastCompletedDate!);
-            if (lastComp.isBefore(DateTime(checkDate.year, checkDate.month, checkDate.day))) {
+            final missedDay = DateTime(checkDate.year, checkDate.month, checkDate.day);
+            
+            if (lastComp.isBefore(missedDay)) {
+                print("Streak Reset LOG: Habit '${habit.name}' missed mandatory day ${checkDateStr}. Last completed: ${habit.lastCompletedDate}");
                 return true;
             }
         }
-        // If we found the latest selected day and it's fine, stop looking back
+        // If we found the latest scheduled day and it was completed (or lastComp is not before it), streak is safe
         return false;
       }
     }
@@ -306,12 +327,19 @@ class HabitCubit extends HydratedCubit<HabitState> {
     _ticker?.cancel();
     _ticker = Timer.periodic(const Duration(seconds: 1), (t) {
       if (_activeHabitIndex == null || _activeHabitIndex! < 0 || _activeHabitIndex! >= state.habits.length) {
+        print("TIMER LOG: Ticker cancelled (index null or invalid)");
         t.cancel();
         return;
       }
       final percent = _calculateElapsedPercent(_activeHabitIndex!);
+      
+      // Log every 10% or on completion
+      if ((percent * 10).floor() > (state.habits[_activeHabitIndex!].timerElapsedPercent * 10).floor() || percent >= 1.0) {
+         print("TIMER LOG: Habit '${state.habits[_activeHabitIndex!].name}' progress: ${(percent * 100).toStringAsFixed(1)}%");
+      }
 
       if (percent >= 1.0) {
+        print("TIMER LOG: Habit '${state.habits[_activeHabitIndex!].name}' reached 100%. Calling completeHabit...");
         t.cancel();
         completeHabit(_activeHabitIndex!);
         _activeHabitIndex = null;
@@ -325,28 +353,28 @@ class HabitCubit extends HydratedCubit<HabitState> {
     if (index < 0 || index >= state.habits.length) return;
     final habit = state.habits[index];
     final now = DateTime.now();
-    final todayStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    final todayStr = _formatDate(now);
     
     // Only increment streak if not already completed today
     int newStreak = habit.streak;
     if (habit.lastCompletedDate != todayStr) {
       newStreak += 1;
+      print("INCREMENT LOG: Habit '${habit.name}' completed. Old: ${habit.streak}, New: $newStreak, Date: $todayStr");
+    } else {
+      print("INCREMENT LOG: Habit '${habit.name}' already completed today ($todayStr). Streak remains $newStreak");
     }
-
-    _updateHabitTimer(
-      index,
-      isRunning: false,
-      elapsedPercent: 1.0,
-      timerStartTime: null,
-      timerTotalDurationMs: null,
-    );
 
     List<HabitModel> updatedHabits = List.from(state.habits);
     updatedHabits[index] = updatedHabits[index].copyWith(
       streak: newStreak,
       lastCompletedDate: todayStr,
+      timerElapsedPercent: 1.0,
+      timerIsRunning: false,
+      timerStartTime: null,
+      timerTotalDurationMs: null,
     );
     emit(state.copyWith(habits: updatedHabits));
+    print("EMIT LOG: State updated for '${habit.name}'. New streak in state: ${updatedHabits[index].streak}");
   }
 
   void pauseTimer(int habitIndex) {
@@ -427,15 +455,15 @@ class HabitCubit extends HydratedCubit<HabitState> {
     if (period == "PM" && hour < 12) finalHour += 12;
     if (period == "AM" && hour == 12) finalHour = 0;
 
-    // schedule notifications on each selected weekday if reminders are enabled for this habit
+    // schedule reminders on each selected weekday if reminders are enabled for this habit
     if (state.isReminderOn && state.selectedDays.isNotEmpty) {
       NotificationHelper.scheduleWeekly(title, finalHour, minute, state.selectedDays);
     }
 
     final newHabit = HabitModel(
       name: title,
-      days: state.selectedDays,
-      time: "$h:$m $period",
+      days: List.from(state.selectedDays),
+      time: "${h.isEmpty ? '0' : h}:${m.isEmpty ? '0' : m} $period",
       timerDuration: timerDuration, 
       isReminderOn: state.isReminderOn,
       createdAt: DateTime.now().millisecondsSinceEpoch,
@@ -447,20 +475,27 @@ class HabitCubit extends HydratedCubit<HabitState> {
   }
 
   void markAsDone(int index) {
-    List<HabitModel> updatedList = List.from(state.habits);
-    HabitModel h = updatedList[index];
-    
-   
-    updatedList[index] = HabitModel(
-      name: h.name,
-      days: h.days,
-      time: h.time,
-      timerDuration: h.timerDuration, 
-      createdAt: h.createdAt,
-      isReminderOn: h.isReminderOn,
-      streak: h.streak + 1,
+    completeHabit(index);
+  }
+
+  void skipHabit(int index) {
+    if (index < 0 || index >= state.habits.length) return;
+    final habit = state.habits[index];
+    final now = DateTime.now();
+    final todayStr = _formatDate(now);
+
+    print("Habit ${habit.name} skipped. Streak reset to 0.");
+
+    List<HabitModel> updatedHabits = List.from(state.habits);
+    updatedHabits[index] = updatedHabits[index].copyWith(
+      streak: 0,
+      lastCompletedDate: todayStr, 
+      timerElapsedPercent: 0.0,
+      timerIsRunning: false,
+      timerStartTime: null,
+      timerTotalDurationMs: null,
     );
-    emit(state.copyWith(habits: updatedList));
+    emit(state.copyWith(habits: updatedHabits));
   }
 
   void deleteHabit(int index) {

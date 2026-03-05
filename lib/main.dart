@@ -19,6 +19,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:attention_anchor/feature/localization/cubit/language_cubit.dart';
 import 'package:attention_anchor/feature/localization/page/localization_page.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
+import 'package:attention_anchor/feature/dashboard/cubit/dashboard_view_cubit.dart';
 import 'package:attention_anchor/theme/theme.dart';
 
 @pragma('vm:entry-point')
@@ -88,6 +89,7 @@ class MyApp extends StatelessWidget {
           BlocProvider(create: (_) => HabitCubit()),
           BlocProvider(create: (_) => BottomBarCubit()),
            BlocProvider(create: (_) => SetupProgressCubit()),
+           BlocProvider(create: (_) => DashboardViewCubit()),
       ],
       child: const AppView(),
     );

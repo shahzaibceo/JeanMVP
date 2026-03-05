@@ -1,9 +1,14 @@
+
+
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:attention_anchor/theme/app_colors.dart';
+import 'package:flutter/material.dart';
 
 class NotificationHelper {
-  static const String channelKey = 'basic_channel';
+  static const String channelKey = 'habit_reminder_channel';
 
+  /// Initialize notification channel and request permission
   static Future<void> initialize() async {
     try {
       // Create notification channel
@@ -15,110 +20,129 @@ class NotificationHelper {
             channelName: 'Habit reminders',
             channelDescription: 'Weekly habit reminder notifications',
             defaultColor: AppColors.primary,
-            importance: NotificationImportance.High,
+            importance: NotificationImportance.Max,
             channelShowBadge: true,
+            criticalAlerts: true,
+            playSound: true,
             enableVibration: true,
-            soundSource: 'resource://raw/water',
+            ledColor: Colors.white,
           ),
         ],
         debug: true,
       );
       print('✓ Notification channel initialized');
-      
+
       // Request notification permissions
-      final isAllowed = await AwesomeNotifications().isNotificationAllowed();
-      print('Notifications allowed: $isAllowed');
-      
-      if (!isAllowed) {
-        final hasPermission = await AwesomeNotifications().requestPermissionToSendNotifications();
-        print('Permission requested: $hasPermission');
-      }
+      await requestPermissions();
     } catch (e) {
       print('❌ Notification initialization error: $e');
     }
   }
-  static int notificationId(String title, String day) => ('$title-$day').hashCode;
+
+  /// Comprehensive permission request
+  static Future<void> requestPermissions() async {
+    bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+    if (!isAllowed) {
+      await AwesomeNotifications().requestPermissionToSendNotifications(
+        channelKey: channelKey,
+        permissions: [
+          NotificationPermission.Alert,
+          NotificationPermission.Sound,
+          NotificationPermission.Badge,
+          NotificationPermission.Vibration,
+          NotificationPermission.Light,
+          // NotificationPermission.PreciseAlarm,
+          
+        ],
+      );
+    }
+  }
+
+  /// Generate a unique and deterministic ID for each habit+day
+  static int notificationId(String habitName, String day) {
+    // Deterministic hash based on habitName and day
+    // This ensures we can update/cancel specific notifications consistently
+    return (habitName.toLowerCase().hashCode ^ day.toLowerCase().hashCode).abs() & 0x7FFFFFFF;
+  }
 
   static int _weekdayFromString(String day) {
-    switch (day) {
-      case 'mon':
-        return DateTime.monday;
-      case 'tue':
-        return DateTime.tuesday;
-      case 'wed':
-        return DateTime.wednesday;
-      case 'thu':
-        return DateTime.thursday;
-      case 'fri':
-        return DateTime.friday;
-      case 'sat':
-        return DateTime.saturday;
-      case 'sun':
-        return DateTime.sunday;
-      default:
-        return DateTime.monday;
+    switch (day.toLowerCase()) {
+      case 'mon': return DateTime.monday;
+      case 'tue': return DateTime.tuesday;
+      case 'wed': return DateTime.wednesday;
+      case 'thu': return DateTime.thursday;
+      case 'fri': return DateTime.friday;
+      case 'sat': return DateTime.saturday;
+      case 'sun': return DateTime.sunday;
+      default: return DateTime.monday;
     }
   }
 
-  /// Schedule a weekly notification for each day in [days] at [hour]:[minute].
-  /// Existing notifications for the same habit/day are canceled first.
-  static Future<void> scheduleWeekly(
-      String title, int hour, int minute, List<String> days) async {
-    try {
-      String? tz = await AwesomeNotifications().getLocalTimeZoneIdentifier();
-      if (tz == null || tz.isEmpty) {
-        tz = DateTime.now().timeZoneName;
-      }
-      print('Using timezone for schedule: $tz');
+  /// Schedule weekly notifications for a habit on specific days
+  static Future<void> scheduleWeekly(String habitName, int hour, int minute, List<String> days) async {
+    if (days.isEmpty) {
+      print('⚠️ No days provided for scheduling notification: $habitName');
+      return;
+    }
 
-      for (final day in days) {
-        final id = notificationId(title, day);
-        await AwesomeNotifications().cancel(id);
-        
-        final result = await AwesomeNotifications().createNotification(
-          content: NotificationContent(
-            id: id,
-            channelKey: channelKey,
-            title: 'Habit Reminder',
-            body: 'It\'s time for: $title',
-            notificationLayout: NotificationLayout.Default,
-            category: NotificationCategory.Reminder,
-            wakeUpScreen: true,
-          ),
-          schedule: NotificationCalendar(
-            weekday: _weekdayFromString(day),
-            hour: hour,
-            minute: minute,
-            second: 0,
-            millisecond: 0,
-            repeats: true,
-            preciseAlarm: true,
-            allowWhileIdle: true,
-            timeZone: tz,
-          ),
-        );
-        print('Scheduled notification for $title on $day at $hour:$minute in $tz - Result: $result');
-      }
-    } catch (e) {
-      print('Error scheduling notification: $e');
+    // Get timezone properly
+    String tz = await AwesomeNotifications().getLocalTimeZoneIdentifier() ?? 'UTC';
+
+    print('Scheduling reminder: $habitName at $hour:$minute for $days in $tz');
+
+    for (final day in days) {
+      final id = notificationId(habitName, day);
+
+      // Cancel any existing notification for this habit/day to avoid duplicates
+      await AwesomeNotifications().cancel(id);
+
+      // Create scheduled notification
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: id,
+          channelKey: channelKey,
+          title: 'Habit Reminder',
+          body: 'It\'s time for: $habitName',
+          notificationLayout: NotificationLayout.Default,
+          category: NotificationCategory.Reminder,
+          wakeUpScreen: true,
+          autoDismissible: true,
+        ),
+        schedule: NotificationCalendar(
+          weekday: _weekdayFromString(day),
+          hour: hour,
+          minute: minute,
+          second: 0,
+          millisecond: 0,
+          repeats: true,
+          preciseAlarm: true,
+          allowWhileIdle: true,
+          timeZone: tz,
+        ),
+      );
+      
+      print('✅ Scheduled $habitName for $day at $hour:$minute (ID: $id)');
     }
   }
 
+  /// Cancel notification by ID
   static Future<void> cancel(int id) => AwesomeNotifications().cancel(id);
 
-  static Future<void> cancelForHabit(String title, List<String> days) async {
+  /// Cancel all notifications for a habit
+  static Future<void> cancelForHabit(String habitName, List<String> days) async {
     for (final day in days) {
-      await cancel(notificationId(title, day));
+      await cancel(notificationId(habitName, day));
     }
   }
 
+  /// Quick test notification 1 minute in the future
   static Future<void> sendTestNotification() async {
     try {
       final now = DateTime.now();
       final testTime = now.add(const Duration(minutes: 1));
 
-      String? tz = await AwesomeNotifications().getLocalTimeZoneIdentifier();
-       DateTime.now().timeZoneName;
+      String tz = await AwesomeNotifications().getLocalTimeZoneIdentifier() ?? 'UTC';
+
       await AwesomeNotifications().createNotification(
         content: NotificationContent(
           id: 999,
@@ -138,9 +162,10 @@ class NotificationHelper {
           timeZone: tz,
         ),
       );
+
       print('Test notification scheduled for ${testTime.hour}:${testTime.minute}');
     } catch (e) {
-      print('Error sending test notification: $e');
+      print('❌ Error sending test notification: $e');
     }
   }
 }

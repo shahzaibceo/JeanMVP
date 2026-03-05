@@ -137,7 +137,7 @@ class SmallField extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: resp.hp(45),
-      width: resp.wp(65),
+      width: resp.wp(60),
       child: CustomTextFormField(
         controller: controller,
         readOnly: false,

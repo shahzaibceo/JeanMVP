@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../common/common_widget/custom_text.dart';
@@ -22,9 +23,14 @@ class FocusScoreSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<HabitCubit, HabitState>(
       builder: (context, habitState) {
-        final totalHabits = habitState.habits.length;
+        final now = DateTime.now();
+        final todayHabits = habitState.habits.where((h) => 
+          context.read<HabitCubit>().isDaySelected(h, now)
+        ).toList();
+        
+        final totalHabits = todayHabits.length;
         final completedHabits =
-            habitState.habits.where((h) => h.timerElapsedPercent >= 1.0).length;
+            todayHabits.where((h) => h.timerElapsedPercent >= 1.0).length;
         final progress =
             totalHabits > 0 ? completedHabits / totalHabits : 0.0;
         final displayScore = (progress * 100).toInt();
@@ -39,8 +45,8 @@ class FocusScoreSection extends StatelessWidget {
                   alignment: Alignment.center,
                   children: [
                     SizedBox(
-                        height: resp.hp(230),
-                      width: resp.hp(230),
+                        height: resp.hp(250),
+                      width: resp.hp(250),
                       child: CircularProgressIndicator(
                         value: progress == 0.0 ? 0.01 : progress,
                         strokeWidth: 12,
@@ -51,6 +57,7 @@ class FocusScoreSection extends StatelessWidget {
                     ),
                     Column(
                       mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         CustomText(
                           text: "$displayScore",
@@ -60,14 +67,14 @@ class FocusScoreSection extends StatelessWidget {
                               ?.copyWith(
                                 color: themeCubit.textColor,
                                 fontWeight: FontWeight.bold,
-                                fontSize: resp.hp(80),
+                                fontSize: 50,
                               ),
                         ),
                         CustomText(
                           text: "focus_score".tr(),
                           style: Theme.of(context)
                               .textTheme
-                              .bodyMedium
+                              .bodySmall
                               ?.copyWith(
                                 color: themeCubit.unselectedColor.withOpacity(0.6),
                                 fontWeight: FontWeight.w600,
@@ -83,7 +90,7 @@ class FocusScoreSection extends StatelessWidget {
                                   : "$completedHabits / $totalHabits ${"habits_done_count".tr()}"),
                           style: Theme.of(context)
                               .textTheme
-                              .bodyMedium
+                              .bodySmall
                               ?.copyWith(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,

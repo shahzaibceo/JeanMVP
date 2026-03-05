@@ -5,7 +5,7 @@ import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-void showDeleteDialog(BuildContext context,int habitIndex) {
+void showDeleteDialog(BuildContext context, int habitIndex) {
   final themeCubit = context.read<ThemeCubit>();
   final habitCubit = context.read<HabitCubit>();
 
@@ -19,7 +19,25 @@ void showDeleteDialog(BuildContext context,int habitIndex) {
       cancelText: "cancel".tr(),
       onConfirm: () {
         habitCubit.deleteHabit(habitIndex);
-        Navigator.pop(context);
+      },
+    ),
+  );
+}
+
+void showSkipDialog(BuildContext context, int habitIndex) {
+  final themeCubit = context.read<ThemeCubit>();
+  final habitCubit = context.read<HabitCubit>();
+
+  showDialog(
+    context: context,
+    builder: (context) => CustomConfirmationDialog(
+      themeCubit: themeCubit,
+      title: "skip_habit".tr(),
+      message: "skip_habit_confirm".tr(),
+      confirmText: "yes_skip".tr(),
+      cancelText: "cancel".tr(),
+      onConfirm: () {
+        habitCubit.skipHabit(habitIndex);
       },
     ),
   );

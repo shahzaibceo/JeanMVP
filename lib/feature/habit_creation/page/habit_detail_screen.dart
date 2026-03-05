@@ -140,12 +140,12 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                       : (habit.timerIsRunning
                           ? "${(habit.timerElapsedPercent * 100).toStringAsFixed(0)}%"
                           : (habit.timerElapsedPercent > 0 ? "resume".tr() : "start".tr())),
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         color: themeCubit.textColor,
                         fontWeight: FontWeight.bold,
                         fontSize: habit.timerElapsedPercent >= 1.0 ? resp.hp(32) : null,
                       ),
-                ),
+                ).withSymmetricPadding(horizontal: resp.wp(12)),
               ],
             ).onTap((){
                     if (habit.timerElapsedPercent >= 1.0) return; // Disable if completed
@@ -157,8 +157,18 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                   
             }),
           ),
+20.sbh(context),
+          if (habit.timerElapsedPercent >= 1.0)
+            CustomText(
+              text: "completion_quote".tr(),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+              textAlign: TextAlign.center,
+            ).withSymmetricPadding(horizontal: resp.wp(24)),
 
-          40.sbh(context),
+          20.sbh(context),
 
           CustomContainer(
             width: double.infinity,
@@ -202,14 +212,22 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                 4.sbh(context),
                  Row(
                   children: [
-                    const Icon(Icons.local_fire_department, color: Colors.green, size: 18),
+                    Icon(Icons.local_fire_department,
+                        color: habit.streak > 0 
+                            ? Colors.green 
+                            : (habit.lastCompletedDate == null ? Colors.grey : Colors.red),
+                        size: 18),
                     4.sbw(context),
                     CustomText(
-                      text: "${habit.streak} ${"day_streak".tr()}",
+                      text: habit.streak > 0
+                          ? "${habit.streak} ${"day_streak".tr()}"
+                          : (habit.lastCompletedDate == null ? "0 ${"day_streak".tr()}" : "end_streak".tr()),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Colors.green,
-                        fontWeight: FontWeight.w600
-                      ),
+                            color: habit.streak > 0 
+                                ? Colors.green 
+                                : (habit.lastCompletedDate == null ? Colors.grey : Colors.red),
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
                   ],
                 ),
@@ -271,9 +289,9 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                         onTap: () => showDeleteDialog(
                             context,widget.habitIndex ),
                         text: "delete".tr(),
-                        color: themeCubit.greyColor.withOpacity(.1),
+                        color: themeCubit.greyColor.withValues(alpha:.1),
                         textColor: themeCubit.textColor,
-                        borderColor:  themeCubit.greyColor, 
+                       borderColor:  themeCubit.greyColor, width: 0.1,
                         height: resp.hp(50),
                       ),
                     ),

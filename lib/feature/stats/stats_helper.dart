@@ -1,5 +1,5 @@
 
-import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';
+import 'package:attention_anchor/feature/habit_creation/model/habit_model.dart';
 import 'package:intl/intl.dart';
 
 class StatsHelper {

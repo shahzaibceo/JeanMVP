@@ -1,4 +1,5 @@
 import 'package:attention_anchor/common/constants/image_strings/app_icons.dart';
+import 'package:attention_anchor/feature/habit_creation/model/habit_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -11,7 +12,6 @@ import '../../../common/utils/responsive_helper/responsive_helper.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/cubit/theme_cubit.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
-import '../../habit_creation/cubit/habit_cubit.dart';
 import '../../habit_creation/page/habit_detail_screen.dart';
 import '../../habit_creation/widget/habit_detail_widget/dialog_box_widget.dart';
 

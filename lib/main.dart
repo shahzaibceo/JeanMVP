@@ -1,4 +1,6 @@
+import 'dart:developer';
 import 'dart:ui';
+import 'package:attention_anchor/feature/dashboard/cubit/dashboard_view_cubit.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:attention_anchor/feature/bottom_nav/cubit/bottom_cubit.dart';
 import 'package:attention_anchor/feature/bottom_nav/page/bottomnav_page.dart';
@@ -19,13 +21,16 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:attention_anchor/feature/localization/cubit/language_cubit.dart';
 import 'package:attention_anchor/feature/localization/page/localization_page.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
-import 'package:attention_anchor/feature/dashboard/cubit/dashboard_view_cubit.dart';
 import 'package:attention_anchor/theme/theme.dart';
+import 'package:attention_anchor/common/utils/fcm_service/cubit/notification_cubit.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  debugPrint("Background message received: ${message.messageId}");
+  log("🔴 Background message received:");
+  log("   Title: ${message.notification?.title}");
+  log("   Body: ${message.notification?.body}");
+  log("   Data: ${message.data}");
 }
 
 void main() async {
@@ -41,7 +46,7 @@ void main() async {
 
   await NotificationHelper.initialize();
   await initializeDateFormatting();
-
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   // Initialize Firebase
   await Firebase.initializeApp(
     options: const FirebaseOptions(
@@ -53,7 +58,6 @@ void main() async {
     ),
   );
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     if (kReleaseMode) {
     FlutterError.onError = (errorDetails) {
@@ -90,6 +94,7 @@ class MyApp extends StatelessWidget {
           BlocProvider(create: (_) => BottomBarCubit()),
            BlocProvider(create: (_) => SetupProgressCubit()),
            BlocProvider(create: (_) => DashboardViewCubit()),
+           BlocProvider(create: (_) => NotificationCubit()),
       ],
       child: const AppView(),
     );
@@ -125,5 +130,5 @@ Widget build(BuildContext context) {
         : const SelectLanguageScreen(showBackButton: false),
   );
 }
-  // }
+
 }

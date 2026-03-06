@@ -13,11 +13,15 @@ import 'package:attention_anchor/feature/localization/cubit/language_state.dart'
 import 'package:attention_anchor/feature/localization/page/localization_page.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
 import 'package:attention_anchor/feature/onboarding/page/onboarding_screen.dart';
+import 'package:attention_anchor/feature/settings/pages/about_us.dart';
 import 'package:attention_anchor/feature/settings/widgets/setting_list_tile.dart';
+import 'package:attention_anchor/theme/app_colors.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:attention_anchor/common/utils/fcm_service/cubit/notification_cubit.dart';
+import 'package:attention_anchor/common/utils/fcm_service/cubit/notification_state.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -27,7 +31,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool isNotificationOn = true;
 
   @override
   Widget build(BuildContext context) {
@@ -101,23 +104,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
             ).withSymmetricPadding(horizontal: resp.wp(20)),
 
-            buildSettingTile(
-              iconPath: AppIcons.notification,
-              title: 'notifications'.tr(),
-              showChevron: false,
-              trailing: Transform.scale(
-                scale: 0.8,
-                child: Switch(
-                  value: isNotificationOn,
-                  onChanged: (val) {
-                    setState(() {
-                      isNotificationOn = val;
-                    });
-                  },
-                  activeColor: Theme.of(context).primaryColor,
-                ),
-              ),
-              context: context,
+            BlocBuilder<NotificationCubit, NotificationState>(
+              builder: (context, state) {
+                return buildSettingTile(
+                  iconPath: AppIcons.notification,
+                  title: 'notifications'.tr(),
+                  showChevron: false,
+                  trailing: Transform.scale(
+                    scale: 0.8,
+                    child: Switch(
+                      value: state.isNotificationOn,
+                      onChanged: (val) {
+                        context.read<NotificationCubit>().toggleNotification(val);
+                      },
+                      activeColor: AppColors.white,
+          activeTrackColor: AppColors.primary,
+          inactiveThumbColor: AppColors.white,
+          inactiveTrackColor: const Color(0xFF9199AA),
+             trackOutlineColor: MaterialStateProperty.resolveWith<Color?>(
+              (states) => Colors.transparent),
+                    ),
+                  ),
+                  context: context,
+                );
+              },
             ).withSymmetricPadding(horizontal: resp.wp(20)),
 
     
@@ -156,10 +166,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: 'about_us'.tr(),
               onTap: () {
                 AnalyticsService.logEvent("about_us_clicked");
-      //           Navigator.of(context).push(
-      //             MaterialPageRoute(builder: (context) => BottomNavigationBarScreen(  
-      //  )),
-      //           );
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => AboutUs(  
+       )),
+                );
               },
               context: context,
             ).withSymmetricPadding(horizontal: resp.wp(20)),

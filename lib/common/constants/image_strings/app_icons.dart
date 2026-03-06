@@ -18,10 +18,6 @@ class AppIcons {
   static String setting = 'assets/icons/setting.svg';
   static String history = 'assets/icons/history.svg';
   static String streakIcon = 'assets/icons/streak_icon.svg';
-  // static String delete = 'assets/icons/delete.svg';
-  // static String edit = 'assets/icons/edit.svg';
-  // static String energyscreen = 'assets/icons/energy_screen.svg';
-  // static String diseasefill = 'assets/icons/diseasefill.svg';
-  // static String disease = 'assets/icons/disease.svg';
-    // static String aboutUs = 'assets/icons/about_us.svg';
+  static String focus= 'assets/icons/focus.svg';
+  static String focusdark= 'assets/icons/focus_dark.svg';
 }

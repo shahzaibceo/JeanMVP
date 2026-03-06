@@ -3,7 +3,7 @@ import 'package:attention_anchor/common/common_widget/custom_text.dart';
 import 'package:attention_anchor/common/constants/image_strings/app_icons.dart';
 import 'package:attention_anchor/common/extensions/sized_box.dart';
 import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
-import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';
+import 'package:attention_anchor/feature/habit_creation/model/habit_model.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';

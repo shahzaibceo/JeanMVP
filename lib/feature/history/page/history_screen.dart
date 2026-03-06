@@ -2,6 +2,7 @@ import 'package:attention_anchor/common/common_widget/app_bar.dart';
 import 'package:attention_anchor/common/common_widget/custom_text.dart';
 import 'package:attention_anchor/common/common_widget/main_background.dart';
 import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
+import 'package:attention_anchor/feature/habit_creation/cubit/habit%20_state.dart';
 import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';
 import 'package:attention_anchor/feature/history/widget/history_card.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart';

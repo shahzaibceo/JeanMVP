@@ -7,11 +7,11 @@ import 'package:attention_anchor/common/constants/image_strings/app_icons.dart';
 import 'package:attention_anchor/common/extensions/gesture_detector.dart';
 import 'package:attention_anchor/common/extensions/sized_box.dart';
 import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
+import 'package:attention_anchor/feature/habit_creation/cubit/habit%20_state.dart';
 import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';
 import 'package:attention_anchor/feature/habit_creation/page/habit_creation_screen.dart';
 import 'package:attention_anchor/feature/habit_creation/page/habit_detail_screen.dart';
 import 'package:attention_anchor/feature/history/page/history_screen.dart';
-import 'package:attention_anchor/feature/stats/page/stats_screen.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart'; // Localization import
 import 'package:attention_anchor/theme/app_colors.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';

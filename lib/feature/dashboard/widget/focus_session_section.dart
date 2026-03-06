@@ -1,6 +1,7 @@
 import 'package:attention_anchor/common/common_widget/custom_conrtainer.dart';
 import 'package:attention_anchor/common/extensions/gesture_detector.dart';
 import 'package:attention_anchor/feature/dashboard/widget/habit_card_widget.dart';
+import 'package:attention_anchor/feature/habit_creation/cubit/habit%20_state.dart';
 import 'package:attention_anchor/feature/habit_creation/page/habit_creation_screen.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
 import 'package:flutter/material.dart';

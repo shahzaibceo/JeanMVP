@@ -44,7 +44,6 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
-      // App went to background - auto-pause timer
       context.read<HabitCubit>().autoPauseTimer();
     }
   }
@@ -81,272 +80,276 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
     final habitCubit = context.watch<HabitCubit>();
     final resp = ResponsiveHelper(context);
 
-    // Get habit directly from index - always in sync with cubit state
-    if (widget.habitIndex < 0 ||
-        widget.habitIndex >= habitCubit.state.habits.length) {
-      return Scaffold(
-        appBar: AppBar(title: Text('error'.tr())),
-        body: Center(child: Text('habit_not_found'.tr())),
-      );
-    }
 
     final habit = habitCubit.state.habits[widget.habitIndex];
     final totalDuration = _parseDuration(habit.timerDuration);
 
-    return MainBackground(
-      appBar: AppBarWidget(
-        showBack: true,
-        title: "habits".tr(),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: resp.wp(16)),
-            child:
-                Center(
-                  child: CustomText(
-                    text: "edit".tr(),
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ).onTap(() {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => HabitCreationView(
-                        habitToEdit: habit,
-                        index: widget.habitIndex,
-                      ),
-                    ),
-                  );
-                }),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          40.sbh(context),
-
-          SizedBox(
-            height: resp.hp(200),
-            width: resp.hp(200),
-            child:
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      height: resp.hp(210),
-                      width: resp.hp(210),
-                      child: CircularProgressIndicator(
-                        value: habit.timerElapsedPercent,
-                        strokeWidth: 8,
-                        color: AppColors.primary,
-                        backgroundColor: themeCubit.greyColor.withValues(
-                          alpha: 0.3,
-                        ),
-                      ),
-                    ),
-                    CustomText(
-                      text: habit.timerElapsedPercent >= 1.0
-                          ? "completed".tr()
-                          : (habit.timerIsRunning
-                                ? "${(habit.timerElapsedPercent * 100).toStringAsFixed(0)}%"
-                                : (habit.timerElapsedPercent > 0
-                                      ? "resume".tr()
-                                      : "start".tr())),
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(
-                            color: themeCubit.textColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: habit.timerElapsedPercent >= 1.0
-                                ? resp.hp(32)
-                                : null,
-                          ),
-                    ).withSymmetricPadding(horizontal: resp.wp(12)),
-                  ],
-                ).onTap(() {
-                  if (habit.timerElapsedPercent >= 1.0)
-                    return; // Disable if completed
-                  if (habit.timerIsRunning) {
-                    habitCubit.pauseTimer(widget.habitIndex);
-                  } else {
-                    habitCubit.startTimer(widget.habitIndex, totalDuration);
-                  }
-                }),
-          ),
-          20.sbh(context),
-          if (habit.timerElapsedPercent >= 1.0)
-            CustomText(
-              text: "completion_quote".tr(),
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ).withSymmetricPadding(horizontal: resp.wp(24)),
-
-          20.sbh(context),
-
-          CustomContainer(
-            width: double.infinity,
-            padding: EdgeInsets.all(resp.wp(16)),
-            borderRadius: resp.radius(20),
-            border: Border.all(color: themeCubit.greyColor, width: 0.1),
-            color: themeCubit.containerColor,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomText(
-                      text: habit.name,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: themeCubit.textColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    CustomContainer(
-                      height: resp.hp(40),
-                      width: resp.hp(40),
-                      border: Border.all(
-                        color: themeCubit.greyColor,
-                        width: 0.1,
-                      ),
-                      borderRadius: resp.radius(10),
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      child: Center(
-                        child: SvgPicture.asset(
-                          AppIcons.icon,
-                          width: resp.wp(20),
-                          height: resp.hp(20),
-                          colorFilter: const ColorFilter.mode(
-                            AppColors.primary,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                4.sbh(context),
-                Row(
-                  children: [
-                    SvgPicture.asset(
-                      AppIcons.streakIcon,
-                      color: habit.streak > 0
-                          ? Colors.green
-                          : (habit.lastCompletedDate == null
-                                ? Colors.grey
-                                : Colors.red),
-                      height: resp.hp(16),
-                      width: resp.wp(16),
-                    ),
-
-                    4.sbw(context),
-                    CustomText(
-                      text: habit.streak > 0
-                          ? "${habit.streak} ${"day_streak".tr()}"
-                          : (habit.lastCompletedDate == null
-                                ? "0 ${"day_streak".tr()}"
-                                : "end_streak".tr()),
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
+          // Auto-pause when leaving the screen
+          final currentHabit =
+              context.read<HabitCubit>().state.habits[widget.habitIndex];
+          if (currentHabit.timerIsRunning) {
+            context.read<HabitCubit>().pauseTimer(widget.habitIndex);
+          }
+        }
+      },
+      child: MainBackground(
+        appBar: AppBarWidget(
+          showBack: true,
+          title: "habits".tr(),
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: resp.wp(16)),
+              child:
+                  Center(
+                    child: CustomText(
+                      text: "edit".tr(),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ).onTap(() {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HabitCreationView(
+                          habitToEdit: habit,
+                          index: widget.habitIndex,
+                        ),
+                      ),
+                    );
+                  }),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            40.sbh(context),
+
+            SizedBox(
+              height: resp.hp(200),
+              width: resp.hp(200),
+              child:
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        height: resp.hp(210),
+                        width: resp.hp(210),
+                        child: CircularProgressIndicator(
+                          value: habit.timerElapsedPercent,
+                          strokeWidth: 8,
+                          color: AppColors.primary,
+                          backgroundColor: themeCubit.greyColor.withValues(
+                            alpha: 0.3,
+                          ),
+                        ),
+                      ),
+                      CustomText(
+                        text: habit.timerElapsedPercent >= 1.0
+                            ? "completed".tr()
+                            : (habit.timerIsRunning
+                                  ? "${(habit.timerElapsedPercent * 100).toStringAsFixed(0)}%"
+                                  : (habit.timerElapsedPercent > 0
+                                        ? "resume".tr()
+                                        : "start".tr())),
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(
+                              color: themeCubit.textColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: habit.timerElapsedPercent >= 1.0
+                                  ? resp.hp(32)
+                                  : null,
+                            ),
+                      ).withSymmetricPadding(horizontal: resp.wp(12)),
+                    ],
+                  ).onTap(() {
+                    if (habit.timerElapsedPercent >= 1.0)
+                      return; // Disable if completed
+                    if (habit.timerIsRunning) {
+                      habitCubit.pauseTimer(widget.habitIndex);
+                    } else {
+                      habitCubit.startTimer(widget.habitIndex, totalDuration);
+                    }
+                  }),
+            ),
+            20.sbh(context),
+            if (habit.timerElapsedPercent >= 1.0)
+              CustomText(
+                text: "completion_quote".tr(),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+              ).withSymmetricPadding(horizontal: resp.wp(24)),
+
+            20.sbh(context),
+
+            CustomContainer(
+              width: double.infinity,
+              padding: EdgeInsets.all(resp.wp(16)),
+              borderRadius: resp.radius(20),
+              border: Border.all(color: themeCubit.greyColor, width: 0.1),
+              color: themeCubit.containerColor,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CustomText(
+                        text: habit.name,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: themeCubit.textColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      CustomContainer(
+                        height: resp.hp(40),
+                        width: resp.hp(40),
+                        border: Border.all(
+                          color: themeCubit.greyColor,
+                          width: 0.1,
+                        ),
+                        borderRadius: resp.radius(10),
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        child: Center(
+                          child: SvgPicture.asset(
+                            AppIcons.icon,
+                            width: resp.wp(20),
+                            height: resp.hp(20),
+                            colorFilter: const ColorFilter.mode(
+                              AppColors.primary,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  4.sbh(context),
+                  Row(
+                    children: [
+                      SvgPicture.asset(
+                        AppIcons.streakIcon,
                         color: habit.streak > 0
                             ? Colors.green
                             : (habit.lastCompletedDate == null
                                   ? Colors.grey
                                   : Colors.red),
-                        fontWeight: FontWeight.w600,
+                        height: resp.hp(16),
+                        width: resp.wp(16),
                       ),
-                    ),
-                  ],
-                ),
-                8.sbh(context),
-                Row(
-                  children: [
-                    const Icon(Icons.timer, color: AppColors.primary, size: 18),
-                    4.sbw(context),
-                    CustomText(
-                      text: habit.timerDuration,
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: themeCubit.textColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                20.sbh(context),
-                CustomText(
-                  text: "history".tr(),
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: themeCubit.textColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                5.sbh(context),
 
-                CustomText(
-                  text: "${"starts_from".tr()} ${_formatDate(habit.createdAt)}",
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: themeCubit.unselectedColor,
+                      4.sbw(context),
+                      CustomText(
+                        text: habit.streak > 0
+                            ? "${habit.streak} ${"day_streak".tr()}"
+                            : (habit.lastCompletedDate == null
+                                  ? "0 ${"day_streak".tr()}"
+                                  : "end_streak".tr()),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: habit.streak > 0
+                              ? Colors.green
+                              : (habit.lastCompletedDate == null
+                                    ? Colors.grey
+                                    : Colors.red),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                20.sbh(context),
-                Row(
-                  children: [
-                    Expanded(
-                      child: CustomButton(
-                        borderRadius: resp.radius(12),
-                        onTap: () {
-                          if (habit.timerElapsedPercent >= 1.0) return;
-                          if (habit.timerIsRunning) {
-                            habitCubit.pauseTimer(widget.habitIndex);
-                          } else {
-                            habitCubit.startTimer(
-                              widget.habitIndex,
-                              totalDuration,
-                            );
-                          }
-                        },
-                        text: habit.timerElapsedPercent >= 1.0
-                            ? "completed".tr()
-                            : (habit.timerIsRunning
-                                  ? "pause".tr()
-                                  : (habit.timerElapsedPercent > 0
-                                        ? "resume".tr()
-                                        : "start".tr())),
-                        height: resp.hp(50),
-                        color: habit.timerElapsedPercent >= 1.0
-                            ? Colors.green.withValues(alpha: 0.2)
-                            : AppColors.primary,
-                        textColor: habit.timerElapsedPercent >= 1.0
-                            ? Colors.green
-                            : AppColors.white,
-                        borderColor: habit.timerElapsedPercent >= 1.0
-                            ? Colors.green.withValues(alpha: 0.2)
-                            : AppColors.primary,
+                  8.sbh(context),
+                  Row(
+                    children: [
+                      const Icon(Icons.timer, color: AppColors.primary, size: 18),
+                      4.sbw(context),
+                      CustomText(
+                        text: habit.timerDuration,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: themeCubit.textColor,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
+                    ],
+                  ),
+                  20.sbh(context),
+                  CustomText(
+                    text: "history".tr(),
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: themeCubit.textColor,
+                      fontWeight: FontWeight.w600,
                     ),
-                    12.sbw(context),
-                    Expanded(
-                      child: CustomButton(
-                        borderRadius: resp.radius(12),
-                        onTap: () =>
-                            showDeleteDialog(context, widget.habitIndex),
-                        text: "delete".tr(),
-                        color: themeCubit.greyColor.withValues(alpha: .1),
-                        textColor: themeCubit.textColor,
-                        borderColor: themeCubit.greyColor,
-                        width: 0.1,
-                        height: resp.hp(50),
+                  ),
+                  5.sbh(context),
+
+                  CustomText(
+                    text: "${"starts_from".tr()} ${_formatDate(habit.createdAt)}",
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: themeCubit.unselectedColor,
+                    ),
+                  ),
+                  20.sbh(context),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomButton(
+                          borderRadius: resp.radius(12),
+                          onTap: () {
+                            if (habit.timerElapsedPercent >= 1.0) return;
+                            if (habit.timerIsRunning) {
+                              habitCubit.pauseTimer(widget.habitIndex);
+                            } else {
+                              habitCubit.startTimer(
+                                widget.habitIndex,
+                                totalDuration,
+                              );
+                            }
+                          },
+                          text: habit.timerElapsedPercent >= 1.0
+                              ? "completed".tr()
+                              : (habit.timerIsRunning
+                                    ? "pause".tr()
+                                    : (habit.timerElapsedPercent > 0
+                                          ? "resume".tr()
+                                          : "start".tr())),
+                          height: resp.hp(50),
+                          color: habit.timerElapsedPercent >= 1.0
+                              ? Colors.green.withValues(alpha: 0.2)
+                              : AppColors.primary,
+                          textColor: habit.timerElapsedPercent >= 1.0
+                              ? Colors.green
+                              : AppColors.white,
+                          borderColor: habit.timerElapsedPercent >= 1.0
+                              ? Colors.green.withValues(alpha: 0.2)
+                              : AppColors.primary,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ).withSymmetricPadding(horizontal: resp.wp(16)),
-        ],
+                      12.sbw(context),
+                      Expanded(
+                        child: CustomButton(
+                          borderRadius: resp.radius(12),
+                          onTap: () =>
+                              showDeleteDialog(context, widget.habitIndex),
+                          text: "delete".tr(),
+                          color: themeCubit.greyColor.withValues(alpha: .1),
+                          textColor: themeCubit.textColor,
+                          borderColor: themeCubit.greyColor,
+                          width: 0.1,
+                          height: resp.hp(50),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ).withSymmetricPadding(horizontal: resp.wp(16)),
+          ],
+        ),
       ),
     );
   }

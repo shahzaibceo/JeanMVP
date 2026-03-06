@@ -5,6 +5,7 @@ import 'package:attention_anchor/common/common_widget/custom_text.dart';
 import 'package:attention_anchor/common/common_widget/main_background.dart';
 import 'package:attention_anchor/common/extensions/sized_box.dart';
 import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
+import 'package:attention_anchor/feature/habit_creation/cubit/habit%20_state.dart';
 import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
 import 'package:attention_anchor/feature/stats/stats_helper.dart';
@@ -12,6 +13,7 @@ import 'package:attention_anchor/theme/app_colors.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 
 class StatsScreen extends StatelessWidget {
   const StatsScreen({super.key});
@@ -29,21 +31,41 @@ class StatsScreen extends StatelessWidget {
       child: BlocBuilder<HabitCubit, HabitState>(
         builder: (context, state) {
           final habits = state.habits;
+
+          if (habits.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Lottie.asset(
+                    'assets/lottie/NO_stat.json',
+                    width: resp.wp(300),
+                    height: resp.hp(300),
+                  ),
+                  20.sbh(context),
+                  CustomText(
+                    text: "no_data_stat".tr(),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: themeCubit.textColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                
+                ],
+              ),
+            );
+          }
+
           final weeklyStats = StatsHelper.getWeeklyStats(habits);
           final monthlyAvg = StatsHelper.getMonthlyAvg(habits);
           final bestStreakHabit = StatsHelper.getBestStreakHabit(habits);
-          final bestDay = StatsHelper.getBestDay(habits);
-          final bestDayRate = StatsHelper.getBestDayCompletionRate(habits, bestDay);
 
           return SingleChildScrollView(
             padding: EdgeInsets.symmetric(horizontal: resp.wp(20), vertical: resp.hp(20)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// WEEKLY STATS HEADER
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+         
                     CustomText(
                       text: "weekly_stats".tr(),
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -51,20 +73,7 @@ class StatsScreen extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                           ),
                     ),
-                    CustomContainer(
-                      padding: EdgeInsets.symmetric(horizontal: resp.wp(8), vertical: resp.hp(4)),
-                      borderRadius: resp.radius(8),
-                      color: AppColors.primary.withOpacity(0.1),
-                      child: CustomText(
-                        text: "last_week_comparison".tr(),
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                    ),
-                  ],
-                ),
+                   
                 20.sbh(context),
 
                 /// MAIN STATS CARD (Bar Chart)
@@ -235,68 +244,7 @@ class StatsScreen extends StatelessWidget {
                 ),
                 24.sbh(context),
 
-                /// SMART INSIGHT
-                // CustomText(
-                //   text: "smart_insight".tr(),
-                //   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                //         color: themeCubit.textColor.withOpacity(0.8),
-                //         fontWeight: FontWeight.bold,
-                //       ),
-                // ),
-                // 16.sbh(context),
-                // CustomContainer(
-                //   padding: EdgeInsets.all(resp.wp(20)),
-                //   borderRadius: resp.radius(24),
-                //   color: themeCubit.containerColor,
-                //   child: Row(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       CustomContainer(
-                //         padding: EdgeInsets.all(resp.wp(12)),
-                //         borderRadius: resp.radius(12),
-                //         color: themeCubit.backgroundColor,
-                //         child: Icon(Icons.calendar_today, color: themeCubit.textColor.withOpacity(0.7)),
-                //       ),
-                //       20.sbw(context),
-                //       Expanded(
-                //         child: Column(
-                //           crossAxisAlignment: CrossAxisAlignment.start,
-                //           children: [
-                //             RichText(
-                //               text: TextSpan(
-                //                 children: [
-                //                   TextSpan(
-                //                     text: "best_day_prefix".tr(),
-                //                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                //                           color: themeCubit.textColor,
-                //                           fontWeight: FontWeight.bold,
-                //                         ),
-                //                   ),
-                //                   TextSpan(
-                //                     text: bestDay.tr(),
-                //                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                //                           color: AppColors.primary,
-                //                           fontWeight: FontWeight.bold,
-                //                         ),
-                //                   ),
-                //                 ],
-                //               ),
-                //             ),
-                //             8.sbh(context),
-                //             CustomText(
-                //               text: "best_day_desc".tr().replaceFirst("{percent}", "${(bestDayRate * 100).toInt()}"),
-                //               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                //                     color: themeCubit.textColor.withOpacity(0.6),
-                //                     height: 1.4,
-                //                   ),
-                //             ),
-                //           ],
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-                40.sbh(context),
+                
               ],
             ),
           );

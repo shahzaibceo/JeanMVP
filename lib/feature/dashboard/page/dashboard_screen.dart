@@ -3,6 +3,7 @@ import 'package:attention_anchor/feature/dashboard/widget/foucs_score_widget.dar
 import 'package:attention_anchor/feature/dashboard/widget/getting_started_card.dart';
 import 'package:attention_anchor/feature/dashboard/widget/header_widget.dart';
 import 'package:attention_anchor/feature/dashboard/widget/start_foucs_button.dart';
+import 'package:attention_anchor/feature/habit_creation/cubit/habit%20_state.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
 import 'package:flutter/material.dart';
 import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';

@@ -21,7 +21,7 @@ Widget buildSettingTile({
   final themeCubit = context.watch<ThemeCubit>();
   final resp = ResponsiveHelper(context);
   return CustomContainer(
-    height: resp.hp(70),
+    height: resp.hp(60),
     margin: EdgeInsets.only(bottom: resp.hp(16)),
     padding: EdgeInsets.symmetric(
       horizontal: resp.wp(16),

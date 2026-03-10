@@ -11,8 +11,7 @@ import 'package:attention_anchor/feature/habit_creation/cubit/habit%20_state.dar
 import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';
 import 'package:attention_anchor/feature/habit_creation/page/habit_creation_screen.dart';
 import 'package:attention_anchor/feature/habit_creation/page/habit_detail_screen.dart';
-import 'package:attention_anchor/feature/history/page/history_screen.dart';
-import 'package:attention_anchor/feature/localization/translation/app_translation.dart'; // Localization import
+import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
 import 'package:attention_anchor/theme/app_colors.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
@@ -31,17 +30,7 @@ class HabitsListScreen extends StatelessWidget {
       appBar: AppBarWidget(
         showBack: true,
         title: "habits".tr(),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HistoryScreen()),
-              );
-            },
-            icon: Icon(Icons.history, color: themeCubit.textColor),
-          ),
-        ],
+      
       ),
       child: Stack(
         children: [

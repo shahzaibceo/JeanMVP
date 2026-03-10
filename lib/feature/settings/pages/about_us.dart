@@ -80,6 +80,33 @@ class AboutUs extends StatelessWidget {
                             color: themeCubit.textColor.withOpacity(0.7),
                           ),
                     ),
+                    05.sbw(context),
+                    Image.asset(
+                      AppImages.appIcon,
+                      width: resp.wp(26),
+                      height: resp.hp(26),
+                    ),
+                    5.sbw(context),
+                    CustomText(
+                      text: "publisher_name".tr(),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: themeCubit.textColor,
+                          ),
+                    ),
+                  ],
+                ),
+                10.sbh(context),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CustomText(
+                      text: "founder".tr(),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: themeCubit.textColor.withOpacity(0.7),
+                          ),
+                    ),
                     05.sbw (context),
                    Image.asset(
                        AppImages.appIcon,
@@ -87,9 +114,10 @@ class AboutUs extends StatelessWidget {
                         height: resp.hp(26),
                       ),
                     
+
                     5.sbw(context),
                     CustomText(
-                      text: "dev_name".tr(),
+                      text: "founder_name".tr(),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w900,
                             color: themeCubit.textColor,

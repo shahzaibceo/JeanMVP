@@ -47,9 +47,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> w
     double barWidth = MediaQuery.of(context).size.width - 40;
     double itemWidth = barWidth / _navItems.length;
 
-    return BlocProvider(
-      create: (_) => BottomBarCubit(),
-      child: BlocBuilder<BottomBarCubit, int>(
+    return  BlocBuilder<BottomBarCubit, int>(
         builder: (context, selectedIndex) {
           return Scaffold(
             backgroundColor: themeCubit.backgroundColor,
@@ -163,8 +161,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> w
             ),
           );
         },
-      ),
-    );
+      );
   }
 }
 

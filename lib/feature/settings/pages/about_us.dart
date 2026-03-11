@@ -108,14 +108,7 @@ class AboutUs extends StatelessWidget {
                           ),
                     ),
                     05.sbw (context),
-                   Image.asset(
-                       AppImages.appIcon,
-                        width: resp.wp(26),
-                        height: resp.hp(26),
-                      ),
-                    
-
-                    5.sbw(context),
+                  
                     CustomText(
                       text: "founder_name".tr(),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(

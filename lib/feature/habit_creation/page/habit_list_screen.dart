@@ -88,7 +88,7 @@ class HabitsListScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        4.sbh(context),
+                        // 4.sbh(context),
                         Row(
                           children: [
                             const Icon(
@@ -108,7 +108,7 @@ class HabitsListScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-
+4.sbh(context),
                         Row(
                           children: [
                             SvgPicture.asset(

@@ -298,12 +298,13 @@ class HabitCubit extends HydratedCubit<HabitState> {
 
     // schedule new reminders only if the habit's toggle is ON
     if (updatedHabit.isReminderOn && updatedHabit.days.isNotEmpty) {
+      print('DEBUG: Scheduling update for ${updatedHabit.name} with days ${updatedHabit.days}');
       final parts = updatedHabit.time.split(' ');
       if (parts.isNotEmpty) {
         final timeParts = parts[0].split(':');
         final h = int.tryParse(timeParts[0]) ?? 0;
         final m = int.tryParse(timeParts[1]) ?? 0;
-        String period = parts.length > 1 ? parts[1] : 'AM';
+        String period = (parts.length > 1 ? parts[1] : 'AM').toUpperCase();
         int finalHour = h;
         if (period == 'PM' && h < 12) finalHour += 12;
         if (period == 'AM' && h == 12) finalHour = 0;
@@ -323,12 +324,14 @@ class HabitCubit extends HydratedCubit<HabitState> {
     // Notification Logic
     int hour = int.tryParse(h) ?? 0;
     int minute = int.tryParse(m) ?? 0;
+    String p = period.toUpperCase();
     int finalHour = hour;
-    if (period == "PM" && hour < 12) finalHour += 12;
-    if (period == "AM" && hour == 12) finalHour = 0;
+    if (p == "PM" && hour < 12) finalHour += 12;
+    if (p == "AM" && hour == 12) finalHour = 0;
 
     // schedule reminders on each selected weekday if reminders are enabled for this habit
     if (state.isReminderOn && state.selectedDays.isNotEmpty) {
+      print('DEBUG: Scheduling new habit $title with days ${state.selectedDays}');
       NotificationHelper.scheduleWeekly(title, finalHour, minute, state.selectedDays);
     }
 
@@ -370,14 +373,39 @@ class HabitCubit extends HydratedCubit<HabitState> {
     emit(state.copyWith(habits: updatedHabits));
   }
 
-  void deleteHabit(int index) {
-    List<HabitModel> updatedList = List.from(state.habits);
-    if (index >= 0 && index < updatedList.length) {
-      // cancel notifications for the habit we're deleting
-      final h = updatedList[index];
-      NotificationHelper.cancelForHabit(h.name, h.days);
-      updatedList.removeAt(index);
-      emit(state.copyWith(habits: updatedList));
+  // void deleteHabit(int index) {
+  //   List<HabitModel> updatedList = List.from(state.habits);
+  //   if (index >= 0 && index < updatedList.length) {
+  //     // cancel notifications for the habit we're deleting
+  //     final h = updatedList[index];
+  //     NotificationHelper.cancelForHabit(h.name, h.days);
+  //     updatedList.removeAt(index);
+  //     emit(state.copyWith(habits: updatedList));
+  //   }
+  // }
+  void deleteHabit(int index) async { // async banayein taake safely cancel ho
+  List<HabitModel> updatedList = List.from(state.habits);
+  
+  if (index >= 0 && index < updatedList.length) {
+    final habitToDelete = updatedList[index];
+    
+    print('Attempting to delete: ${habitToDelete.name}');
+
+    // 1. Pehle notifications cancel karein
+    try {
+      await NotificationHelper.cancelForHabit(habitToDelete.name, habitToDelete.days);
+      print('✅ Notifications cancelled for ${habitToDelete.name}');
+    } catch (e) {
+      print('❌ Error cancelling notifications: $e');
     }
+
+    // 2. List se remove karein
+    updatedList.removeAt(index);
+
+    // 3. New state emit karein
+    emit(state.copyWith(habits: updatedList));
+  } else {
+    print('⚠️ Invalid index: $index');
   }
+}
 }

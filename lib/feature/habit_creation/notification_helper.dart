@@ -35,8 +35,8 @@ class NotificationHelper {
     }
   }
 
-  /// Comprehensive permission request
   static Future<void> requestPermissions() async {
+    // Check general notification allowance
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
     if (!isAllowed) {
       await AwesomeNotifications().requestPermissionToSendNotifications(
@@ -47,9 +47,23 @@ class NotificationHelper {
           NotificationPermission.Badge,
           NotificationPermission.Vibration,
           NotificationPermission.Light,
-          
+          NotificationPermission.PreciseAlarms,
         ],
       );
+    } else {
+      // General notifications allowed, but check for Precise Alarms (critical for Android 12+)
+      List<NotificationPermission> permissions = await AwesomeNotifications().checkPermissionList(
+        channelKey: channelKey,
+        permissions: [NotificationPermission.PreciseAlarms],
+      );
+      
+      if (!permissions.contains(NotificationPermission.PreciseAlarms)) {
+        print('⚠️ Precise Alarms permission missing. Asking user...');
+        await AwesomeNotifications().requestPermissionToSendNotifications(
+          channelKey: channelKey,
+          permissions: [NotificationPermission.PreciseAlarms],
+        );
+      }
     }
   }
 
@@ -121,13 +135,20 @@ class NotificationHelper {
   /// Cancel notification by ID
   static Future<void> cancel(int id) => AwesomeNotifications().cancel(id);
 
-  /// Cancel all notifications for a habit
-  static Future<void> cancelForHabit(String habitName, List<String> days) async {
-    for (final day in days) {
-      await cancel(notificationId(habitName, day));
-    }
+  // /// Cancel all notifications for a habit
+  // static Future<void> cancelForHabit(String habitName, List<String> days) async {
+  //   for (final day in days) {
+  //     await cancel(notificationId(habitName, day));
+  //   }
+  // }
+static Future<void> cancelForHabit(String habitName, List<String> days) async {
+  for (final day in days) {
+    // Check karein ke notificationId(habitName, day) wahi number de raha hai?
+    int id = notificationId(habitName, day);
+    await AwesomeNotifications().cancel(id);
+    print('Cancelled ID: $id for $habitName on $day');
   }
-
+}
   /// Quick test notification 1 minute in the future
   static Future<void> sendTestNotification() async {
     try {
@@ -162,3 +183,4 @@ class NotificationHelper {
     }
   }
 }
+

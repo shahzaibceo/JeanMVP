@@ -84,8 +84,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> w
                           return AnimatedPositioned(
                             duration: const Duration(milliseconds: 350),
                             curve: Curves.easeInOut,
-                            left: xOffset - 30, 
-                            // right: xOffset +1, 
+                            left: xOffset - 55,
                             top: -25,
                             child: Column(
                               children: [
@@ -110,12 +109,17 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> w
                                   ),
                                 ),
                                 8.sbh(context), 
-                                CustomText(
-                                  text: _navItems[selectedIndex]['label'],
-                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                        color: themeCubit.textColor,
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                            SizedBox(
+                              width: itemWidth,
+
+                                  child: CustomText(
+                                    textAlign: TextAlign.center,
+                                    text: _navItems[selectedIndex]['label'],
+                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                          color: themeCubit.textColor,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                  ),
                                 ),
                               ],
                             ),

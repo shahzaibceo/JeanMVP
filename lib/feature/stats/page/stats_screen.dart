@@ -43,12 +43,16 @@ class StatsScreen extends StatelessWidget {
                     height: resp.hp(300),
                   ),
                   20.sbh(context),
-                  CustomText(
-                    text: "no_data_stat".tr(),
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: themeCubit.textColor,
-                          fontWeight: FontWeight.w600,
-                        ),
+                  SizedBox(
+                    width: resp.wp(320),
+                    child: CustomText(
+                        textAlign: TextAlign.center,
+                        text: "no_data_stat".tr(),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: themeCubit.textColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
                   ),
                 
                 ],

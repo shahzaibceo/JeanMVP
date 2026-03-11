@@ -22,6 +22,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:attention_anchor/common/utils/fcm_service/cubit/notification_cubit.dart';
 import 'package:attention_anchor/common/utils/fcm_service/cubit/notification_state.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -139,7 +141,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               trailing: BlocBuilder<ThemeCubit, ThemeState>(
                 builder: (context, state) {
                   return SizedBox(
-                    width: resp.wp(100),
+                    width: resp.wp(80),
                     child: CustomText(
                         textAlign: TextAlign.end,
                         maxLines:1 ,
@@ -191,17 +193,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             buildSettingTile(
               iconPath: AppIcons.privacy,
               title: 'privacy_policy'.tr(),
-              //  onTap: () {
-              //      Navigator.of(context).push(
-              //     MaterialPageRoute(builder: (context) => HabitCreationView()),
-              //   );
-              //  },
+             
 
-              // onTap: () async {
-              //   AnalyticsService.logEvent("privacy_policy_clicked");
-              //   final url = Uri.parse('https://sites.google.com/devtrixsol.com/livewallpaperapp/home');
-              //   await launchUrl(url, mode: LaunchMode.inAppWebView);
-              // },
+              onTap: () async {
+                AnalyticsService.logEvent("privacy_policy_clicked");
+                final url = Uri.parse('https://sites.google.com/devtrixsol.com/livewallpaperapp/home');
+                await launchUrl(url, mode: LaunchMode.inAppWebView);
+              },
               context: context,
             ).withSymmetricPadding(horizontal: resp.wp(20)),
 
@@ -209,10 +207,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             buildSettingTile(
               iconPath: AppIcons.share,
               title: 'share'.tr(),
-              // onTap: () {
-              //   AnalyticsService.logEvent("share_clicked");
-              //   Share.share("Check out this amazing App!\nhttps://play.google.com/store/apps/details?id=com.recipekeeper.mealplanner.recipebook");
-              // },
+              onTap: () {
+                AnalyticsService.logEvent("share_clicked");
+                Share.share("Check out this amazing App!\nhttps://play.google.com/store/apps/details?id=com.habittracker.focusapp.dailyreminders");
+              },
               context: context,
             ).withSymmetricPadding(horizontal: resp.wp(20)),
 
@@ -220,14 +218,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             buildSettingTile(
               iconPath: AppIcons.rate,
               title: 'rate_us'.tr(),
-              // onTap: () async {
-              //   AnalyticsService.logEvent("rate_us_clicked");
-              //   const packageName = "com.recipekeeper.mealplanner.recipebook";
-              //   final Uri uri = Uri.parse("https://play.google.com/store/apps/details?id=$packageName");
-              //   if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-              //     debugPrint('Could not launch $uri');
-              //   }
-              // },
+              onTap: () async {
+                AnalyticsService.logEvent("rate_us_clicked");
+                const packageName = "com.habittracker.focusapp.dailyreminders";
+                final Uri uri = Uri.parse("https://play.google.com/store/apps/details?id=$packageName");
+                if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+                  debugPrint('Could not launch $uri');
+                }
+              },
               context: context,
             ).withSymmetricPadding(horizontal: resp.wp(20)),
 

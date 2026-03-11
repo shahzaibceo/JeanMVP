@@ -1,4 +1,4 @@
-package com.example.attention_anchor
+package com.habittracker.focusapp.dailyreminders
 
 import io.flutter.embedding.android.FlutterActivity
 

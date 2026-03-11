@@ -135,12 +135,7 @@ class NotificationHelper {
   /// Cancel notification by ID
   static Future<void> cancel(int id) => AwesomeNotifications().cancel(id);
 
-  // /// Cancel all notifications for a habit
-  // static Future<void> cancelForHabit(String habitName, List<String> days) async {
-  //   for (final day in days) {
-  //     await cancel(notificationId(habitName, day));
-  //   }
-  // }
+
 static Future<void> cancelForHabit(String habitName, List<String> days) async {
   for (final day in days) {
     // Check karein ke notificationId(habitName, day) wahi number de raha hai?

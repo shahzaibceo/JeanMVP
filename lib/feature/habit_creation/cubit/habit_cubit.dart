@@ -179,8 +179,6 @@ class HabitCubit extends HydratedCubit<HabitState> {
     final habit = state.habits[habitIndex];
     if (habit.timerIsRunning) return;
 
-    // If we have an existing elapsedPercent (paused before), compute
-    // a start timestamp so that elapsed continues from that point.
     final totalMs = totalDuration.inMilliseconds;
     final initialElapsedMs = (habit.timerElapsedPercent * totalMs).round();
     final adjustedStart = DateTime.now().millisecondsSinceEpoch - initialElapsedMs;
@@ -373,17 +371,7 @@ class HabitCubit extends HydratedCubit<HabitState> {
     emit(state.copyWith(habits: updatedHabits));
   }
 
-  // void deleteHabit(int index) {
-  //   List<HabitModel> updatedList = List.from(state.habits);
-  //   if (index >= 0 && index < updatedList.length) {
-  //     // cancel notifications for the habit we're deleting
-  //     final h = updatedList[index];
-  //     NotificationHelper.cancelForHabit(h.name, h.days);
-  //     updatedList.removeAt(index);
-  //     emit(state.copyWith(habits: updatedList));
-  //   }
-  // }
-  void deleteHabit(int index) async { // async banayein taake safely cancel ho
+  void deleteHabit(int index) async { 
   List<HabitModel> updatedList = List.from(state.habits);
   
   if (index >= 0 && index < updatedList.length) {

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1098629987702",
+    "project_id": "attentionanchor-6f8fe",
+    "storage_bucket": "attentionanchor-6f8fe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1098629987702:android:fcf0fe43de76d68f4ace57",
+        "android_client_info": {
+          "package_name": "com.habittracker.focusapp.dailyreminders"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiWFyHePbnoVx1BdK5SNgyKV7w8PL7Ow0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

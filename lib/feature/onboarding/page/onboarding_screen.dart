@@ -6,6 +6,7 @@ import 'package:attention_anchor/common/extensions/padding_extension.dart';
 import 'package:attention_anchor/common/extensions/sized_box.dart';
 import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
 import 'package:attention_anchor/common/common_widget/custom_button.dart';
+import 'package:attention_anchor/feature/bottom_nav/cubit/bottom_cubit.dart';
 import 'package:attention_anchor/feature/bottom_nav/page/bottomnav_page.dart';
 import 'package:attention_anchor/feature/onboarding/cubit/onboarding_cubit.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
@@ -18,7 +19,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class OnboardingScreen extends StatelessWidget {
-   OnboardingScreen({super.key});
+  final bool isFromSettings;
+  OnboardingScreen({super.key, this.isFromSettings = false});
 
   final List<Map<String, String>> onboardingOptions = [
     {
@@ -179,11 +181,18 @@ class OnboardingScreen extends StatelessWidget {
                         onTap: () {
                           // Mark onboarding as complete in persistent storage
                           context.read<OnboardingCubit>().completeOnboarding();
-
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(builder: (_) => const BottomNavigationBarScreen()),
-                            (route) => false,
-                          );
+                          
+                          if (isFromSettings) {
+                            context.read<BottomBarCubit>().changeTab(0);
+                            Navigator.of(context).pop();
+                          } else {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder: (_) => const BottomNavigationBarScreen(),
+                              ),
+                              (route) => false,
+                            );
+                          }
                         },
                         text: "continue".tr(),
                         width: resp.wp(350),

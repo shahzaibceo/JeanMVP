@@ -1,6 +1,7 @@
-
 import 'package:attention_anchor/common/common_widget/app_bar.dart';
-import 'package:attention_anchor/common/common_widget/custom_text.dart' show CustomText;
+import 'package:attention_anchor/feature/bottom_nav/cubit/bottom_cubit.dart';
+import 'package:attention_anchor/common/common_widget/custom_text.dart'
+    show CustomText;
 import 'package:attention_anchor/common/common_widget/main_background.dart';
 import 'package:attention_anchor/common/constants/image_strings/app_icons.dart';
 import 'package:attention_anchor/common/extensions/padding_extension.dart';
@@ -33,26 +34,38 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-
   @override
   Widget build(BuildContext context) {
     final themeCubit = context.watch<ThemeCubit>();
     FirebaseAnalytics.instance.logScreenView(screenName: "settings_screen");
     final resp = ResponsiveHelper(context);
 
-    return MainBackground(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        context.read<BottomBarCubit>().changeTab(0);
+      },
+      child: MainBackground(
         appBar: AppBarWidget(
           title: "settings".tr(),
           showBack: true,
-          onTap: () => Navigator.of(context).pop(),
+          onTap: () {
+            context.read<BottomBarCubit>().changeTab(0);
+          },
         ),
       child: SafeArea(
         bottom: true,
         top: false,
         child: ListView(
           children: [
-            _buildSectionTitle(context, 'general_setting'.tr(), themeCubit, resp),
-            
+            _buildSectionTitle(
+              context,
+              'general_setting'.tr(),
+              themeCubit,
+              resp,
+            ),
+
             // Language Tile
             buildSettingTile(
               iconPath: AppIcons.language,
@@ -63,13 +76,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     width: resp.wp(120),
                     child: CustomText(
                       textAlign: TextAlign.end,
-                      maxLines:1 ,
+                      maxLines: 1,
                       overflow: true,
                       text: state.selectedLanguageCode.tr(),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: themeCubit.unselectedColor,
-                          ),
+                        fontWeight: FontWeight.w500,
+                        color: themeCubit.unselectedColor,
+                      ),
                     ),
                   );
                 },
@@ -78,12 +91,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onTap: () {
                 AnalyticsService.logEvent("language_selected_clicked");
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SelectLanguageScreen(showBackButton: true)),
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const SelectLanguageScreen(showBackButton: true),
+                  ),
                 );
               },
             ).withSymmetricPadding(horizontal: resp.wp(20)),
 
- buildSettingTile(
+            buildSettingTile(
               iconPath: AppIcons.language,
               title: 'history'.tr(),
               trailing: BlocBuilder<LanguageCubit, LanguageState>(
@@ -91,9 +107,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   return CustomText(
                     text: "view".tr(),
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: themeCubit.unselectedColor,
-                        ),
+                      fontWeight: FontWeight.w500,
+                      color: themeCubit.unselectedColor,
+                    ),
                   );
                 },
               ),
@@ -117,22 +133,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: Switch(
                       value: state.isNotificationOn,
                       onChanged: (val) {
-                        context.read<NotificationCubit>().toggleNotification(val);
+                        context.read<NotificationCubit>().toggleNotification(
+                          val,
+                        );
                       },
                       activeColor: AppColors.white,
-          activeTrackColor: AppColors.primary,
-          inactiveThumbColor: AppColors.white,
-          inactiveTrackColor: const Color(0xFF9199AA),
-             trackOutlineColor: MaterialStateProperty.resolveWith<Color?>(
-              (states) => Colors.transparent),
+                      activeTrackColor: AppColors.primary,
+                      inactiveThumbColor: AppColors.white,
+                      inactiveTrackColor: const Color(0xFF9199AA),
+                      trackOutlineColor:
+                          MaterialStateProperty.resolveWith<Color?>(
+                            (states) => Colors.transparent,
+                          ),
                     ),
                   ),
                   context: context,
                 );
               },
             ).withSymmetricPadding(horizontal: resp.wp(20)),
-
-    
 
             // Appearance Tile
             buildSettingTile(
@@ -143,14 +161,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   return SizedBox(
                     width: resp.wp(80),
                     child: CustomText(
-                        textAlign: TextAlign.end,
-                        maxLines:1 ,
-                        overflow: true,
+                      textAlign: TextAlign.end,
+                      maxLines: 1,
+                      overflow: true,
                       text: state.mode.trKey.tr(),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: themeCubit.unselectedColor,
-                          ),
+                        fontWeight: FontWeight.w500,
+                        color: themeCubit.unselectedColor,
+                      ),
                     ),
                   );
                 },
@@ -160,18 +178,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ).withSymmetricPadding(horizontal: resp.wp(20)),
 
             // Data & Privacy Policy Section
-            _buildSectionTitle(context, 'data_privacy_policy'.tr(), themeCubit, resp),
-            
+            _buildSectionTitle(
+              context,
+              'data_privacy_policy'.tr(),
+              themeCubit,
+              resp,
+            ),
+
             // About Us
             buildSettingTile(
               iconPath: AppIcons.aboutUs,
               title: 'about_us'.tr(),
               onTap: () {
                 AnalyticsService.logEvent("about_us_clicked");
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => AboutUs(  
-       )),
-                );
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (context) => AboutUs()));
               },
               context: context,
             ).withSymmetricPadding(horizontal: resp.wp(20)),
@@ -182,8 +204,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: 'how_to_use'.tr(),
               onTap: () {
                 AnalyticsService.logEvent("how_to_use_clicked");
-               Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => OnboardingScreen()),
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => OnboardingScreen(isFromSettings: true),
+                  ),
                 );
               },
               context: context,
@@ -193,11 +217,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             buildSettingTile(
               iconPath: AppIcons.privacy,
               title: 'privacy_policy'.tr(),
-             
-
               onTap: () async {
                 AnalyticsService.logEvent("privacy_policy_clicked");
-                final url = Uri.parse('https://sites.google.com/devtrixsol.com/livewallpaperapp/home');
+                final url = Uri.parse(
+                  'https://sites.google.com/attentionanchor.com/attentionanchor/home',
+                );
                 await launchUrl(url, mode: LaunchMode.inAppWebView);
               },
               context: context,
@@ -209,7 +233,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               title: 'share'.tr(),
               onTap: () {
                 AnalyticsService.logEvent("share_clicked");
-                Share.share("Check out this amazing App!\nhttps://play.google.com/store/apps/details?id=com.habittracker.focusapp.dailyreminders");
+                Share.share(
+                  "Check out this amazing App!\nhttps://play.google.com/store/apps/details?id=com.habittracker.focusapp.dailyreminders",
+                );
               },
               context: context,
             ).withSymmetricPadding(horizontal: resp.wp(20)),
@@ -221,8 +247,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onTap: () async {
                 AnalyticsService.logEvent("rate_us_clicked");
                 const packageName = "com.habittracker.focusapp.dailyreminders";
-                final Uri uri = Uri.parse("https://play.google.com/store/apps/details?id=$packageName");
-                if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+                final Uri uri = Uri.parse(
+                  "https://play.google.com/store/apps/details?id=$packageName",
+                );
+                if (!await launchUrl(
+                  uri,
+                  mode: LaunchMode.externalApplication,
+                )) {
                   debugPrint('Could not launch $uri');
                 }
               },
@@ -233,16 +264,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
-  );
-}
+      ),
+    );
+  }
 
-  Widget _buildSectionTitle(BuildContext context, String text, ThemeCubit theme, ResponsiveHelper resp) {
+  Widget _buildSectionTitle(
+    BuildContext context,
+    String text,
+    ThemeCubit theme,
+    ResponsiveHelper resp,
+  ) {
     return CustomText(
       text: text,
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: theme.textColor,
-          ),
+        fontWeight: FontWeight.w700,
+        color: theme.textColor,
+      ),
     ).withSymmetricPadding(horizontal: resp.wp(20), vertical: resp.wp(10));
   }
 
@@ -264,9 +301,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   CustomText(
                     text: 'app_theme'.tr(),
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: themeCubit.textColor,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      color: themeCubit.textColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
@@ -275,9 +312,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
               20.sbh(context),
-              _buildThemeOption(context, 'system'.tr(), AppThemeMode.system, themeCubit, resp),
-              _buildThemeOption(context, 'light'.tr(), AppThemeMode.light, themeCubit, resp),
-              _buildThemeOption(context, 'dark'.tr(), AppThemeMode.dark, themeCubit, resp),
+              _buildThemeOption(
+                context,
+                'system'.tr(),
+                AppThemeMode.system,
+                themeCubit,
+                resp,
+              ),
+              _buildThemeOption(
+                context,
+                'light'.tr(),
+                AppThemeMode.light,
+                themeCubit,
+                resp,
+              ),
+              _buildThemeOption(
+                context,
+                'dark'.tr(),
+                AppThemeMode.dark,
+                themeCubit,
+                resp,
+              ),
             ],
           ),
         ),
@@ -285,13 +340,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildThemeOption(BuildContext context, String title, AppThemeMode mode, ThemeCubit themeCubit, ResponsiveHelper resp) {
+  Widget _buildThemeOption(
+    BuildContext context,
+    String title,
+    AppThemeMode mode,
+    ThemeCubit themeCubit,
+    ResponsiveHelper resp,
+  ) {
     return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, state) {
-        final isSelected = state.mode == mode; 
+        final isSelected = state.mode == mode;
         return InkWell(
           onTap: () {
-            context.read<ThemeCubit>().setTheme(mode); 
+            context.read<ThemeCubit>().setTheme(mode);
             Navigator.of(context).pop();
           },
           child: Padding(
@@ -302,9 +363,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 CustomText(
                   text: title,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: themeCubit.textColor.withOpacity(isSelected ? 1.0 : 0.7),
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                      ),
+                    color: themeCubit.textColor.withOpacity(
+                      isSelected ? 1.0 : 0.7,
+                    ),
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                  ),
                 ),
                 Container(
                   width: 20,
@@ -312,7 +375,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected ? themeCubit.textColor : themeCubit.textColor.withOpacity(0.3),
+                      color: isSelected
+                          ? themeCubit.textColor
+                          : themeCubit.textColor.withOpacity(0.3),
                       width: 2,
                     ),
                   ),

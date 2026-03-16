@@ -56,9 +56,11 @@ class _SelectLanguageScreenState extends State<SelectLanguageScreen> {
           actions: [
             IconButton(
               onPressed: () {
-                 Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) =>  OnboardingScreen()),
-      );
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => OnboardingScreen(isFromSettings: false),
+                    ),
+                  );
               },
               icon: SvgPicture.asset(AppIcons.tick, color: themeCubit.textColor, width: resp.wp(20)),
             ),

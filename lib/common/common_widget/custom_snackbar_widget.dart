@@ -16,10 +16,10 @@ class CustomSnackBar {
           text: message,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: textColor,
+                color: AppColors.white,
               ),
         ),
-        backgroundColor: backgroundColor,
+        backgroundColor: AppColors.primary,
         behavior: SnackBarBehavior.floating,
         duration: duration,
         margin: const EdgeInsets.all(16),

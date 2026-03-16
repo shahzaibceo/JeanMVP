@@ -1,3 +1,4 @@
+import 'package:attention_anchor/common/utils/force_update/service/force_update_maneger.dart';
 import 'package:attention_anchor/feature/dashboard/widget/focus_session_section.dart';
 import 'package:attention_anchor/feature/dashboard/widget/foucs_score_widget.dart';
 import 'package:attention_anchor/feature/dashboard/widget/getting_started_card.dart';
@@ -13,8 +14,24 @@ import 'package:attention_anchor/common/extensions/sized_box.dart';
 import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+   @override
+  void initState() {
+    super.initState();
+
+     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      ForceUpdateManager().checkAndShowUpdateIfNeeded(context);
+    });
+
+  }
+
   String _title(int step) {
     switch (step) {
       case 1:

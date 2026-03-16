@@ -5,8 +5,11 @@ import 'package:flutter/material.dart';
 
 class RemoteConfigService {
   final remoteConfig = FirebaseRemoteConfig.instance;
+  bool _isInitialized = false;
+  bool get isInitialized => _isInitialized;
 
   Future<void> initialize() async {
+    if (_isInitialized) return;
     try {
       debugPrint('🔄 Initializing Remote Config...');
 
@@ -42,6 +45,7 @@ class RemoteConfigService {
         debugPrint(
           '📄 Raw force update config: ${forceUpdateValue.asString()}',
         );
+        _isInitialized = true;
       } catch (e) {
         debugPrint('❌ Fetch/Activate failed: $e');
       }
@@ -57,7 +61,7 @@ class RemoteConfigService {
       "latest_version": "1.1.0",
       "force_update": true,
       "playstore_url":
-          "https://play.google.com/store/apps/details?id=com.plantidentifier.plantcare.plantscanner",
+          "https://play.google.com/store/apps/details?id=com.habittracker.focusapp.dailyreminders",
     },
   };
 

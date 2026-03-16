@@ -1,3 +1,4 @@
+import 'package:attention_anchor/common/common_widget/custom_snackbar_widget.dart';
 import 'package:attention_anchor/feature/habit_creation/model/habit_model.dart';
 import 'package:attention_anchor/feature/habit_creation/widget/habit_creation_widget.dart/build_weekly_days.dart';
 import 'package:attention_anchor/feature/habit_creation/widget/habit_creation_widget.dart/name_field_widget.dart';
@@ -207,15 +208,30 @@ class _HabitCreationViewState extends State<HabitCreationView> {
   }
 
   void _handleSave(HabitCubit habitCubit) {
-    if (_nameController.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("please_enter_habit_name".tr())));
+    final name = _nameController.text.trim();
+    final selectedDays = habitCubit.state.selectedDays;
+    final hours =
+        int.tryParse(_timerHours.text.isEmpty ? "0" : _timerHours.text) ?? 0;
+    final minutes =
+        int.tryParse(_timerMints.text.isEmpty ? "0" : _timerMints.text) ?? 0;
+
+   
+    if (name.isEmpty) {
+      CustomSnackBar.show(context, message: "please_enter_habit_name".tr());
       return;
     }
 
+    if (selectedDays.isEmpty) {
+      CustomSnackBar.show(context, message: "please_select_at_least_one_day".tr());
+      return;
+    }
+
+    if (hours == 0 && minutes == 0) {
+      CustomSnackBar.show(context, message: "please_set_timer_duration".tr());
+      return;
+    }
     String timerDur =
-        "${_timerHours.text.isEmpty ? "00" : _timerHours.text}:${_timerMints.text.isEmpty ? "00" : _timerMints.text}";
+        "${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}";
     String reminderTime =
         "${_fromHours.text.isEmpty ? "00" : _fromHours.text}:${_fromMints.text.isEmpty ? "00" : _fromMints.text} ${habitCubit.state.fromPeriod}";
 

@@ -18,6 +18,7 @@ import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class HabitDetailsScreen extends StatefulWidget {
   final int habitIndex;
@@ -37,6 +38,7 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
 
   @override
   void dispose() {
+    WakelockPlus.disable();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -46,6 +48,7 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
       context.read<HabitCubit>().autoPauseTimer();
+      WakelockPlus.disable();
     }
   }
 
@@ -75,6 +78,15 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
     return "${date.day} ${months[date.month - 1]}, ${date.year}";
   }
 
+  String _getRemainingTime(double percent, Duration total) {
+    if (percent >= 1.0) return "00:00";
+    final remainingMs = (total.inMilliseconds * (1 - percent)).round();
+    final duration = Duration(milliseconds: remainingMs);
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds % 60;
+    return "${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeCubit = context.watch<ThemeCubit>();
@@ -87,6 +99,12 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
         final habit = state.habits[widget.habitIndex];
         final habitCubit = context.read<HabitCubit>();
         final totalDuration = _parseDuration(habit.timerDuration);
+
+        if (habit.timerElapsedPercent < 1.0) {
+          WakelockPlus.enable();
+        } else {
+          WakelockPlus.disable();
+        }
 
         return PopScope(
           onPopInvokedWithResult: (didPop, result) {
@@ -113,6 +131,9 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                           ),
                     ),
                   ).onTap(() {
+                    if (habit.timerIsRunning) {
+                      habitCubit.pauseTimer(widget.habitIndex);
+                    }
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -151,16 +172,17 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                         text: habit.timerElapsedPercent >= 1.0
                             ? "completed".tr()
                             : (habit.timerIsRunning
-                                ? "${(habit.timerElapsedPercent * 100).toStringAsFixed(0)}%"
+                                ? "${_getRemainingTime(habit.timerElapsedPercent, totalDuration)}\n${(habit.timerElapsedPercent * 100).toStringAsFixed(1)}%"
                                 : (habit.timerElapsedPercent > 0
                                     ? "resume".tr()
                                     : "start".tr())),
+                        textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                               color: themeCubit.textColor,
                               fontWeight: FontWeight.bold,
                               fontSize: habit.timerElapsedPercent >= 1.0
-                                  ? resp.hp(32)
-                                  : null,
+                                  ? resp.hp(22)
+                                  : (habit.timerIsRunning ? resp.hp(24) : null),
                             ),
                       ).withSymmetricPadding(horizontal: resp.wp(12)),
                     ],

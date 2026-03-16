@@ -24,6 +24,7 @@ class LanguageCubit extends HydratedCubit<LanguageState> {
     {"name": "Portuguese (Português)", "code": "pt", "id": "pt"},
     {"name": "Russian (Русский)", "code": "ru", "id": "ru"},
     {"name": "Indonesian (Bahasa Indonesia)", "code": "id", "id": "id"},
+    {"name": "Spanish (Español)", "code": "es", "id": "es"},
   ];
 
   final Map<String, Locale> localeMap = {
@@ -37,6 +38,7 @@ class LanguageCubit extends HydratedCubit<LanguageState> {
     "Portuguese (Português)": const Locale('pt', 'PT'),
     "Russian (Русский)": const Locale('ru', 'RU'),
     "Indonesian (Bahasa Indonesia)": const Locale('id', 'ID'),
+    "Spanish (Español)": const Locale('es', 'ES'),
   };
 
   List<Map<String, String>> get filteredLanguages {

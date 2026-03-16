@@ -49,6 +49,9 @@ class ForceUpdateManager {
   Future<void> checkAndShowUpdateIfNeeded(BuildContext context) async {
     try {
       debugPrint('🔄 Checking for force updates...');
+      
+      // Ensure Remote Config is initialized
+      await _remoteConfigService.initialize();
 
       // 1. Get force update config
       final config = _remoteConfigService.getForceUpdateConfig();

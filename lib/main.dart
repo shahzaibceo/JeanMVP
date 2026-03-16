@@ -36,7 +36,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  // Initialize Storage
   final storage = await HydratedStorage.build(
     storageDirectory: HydratedStorageDirectory(
       (await getApplicationDocumentsDirectory()).path,
@@ -46,20 +45,19 @@ void main() async {
 
   await NotificationHelper.initialize();
   await initializeDateFormatting();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  // Initialize Firebase
+ FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await Firebase.initializeApp(
     options: const FirebaseOptions(
-      apiKey: 'AIzaSyC57CLJ4zE7cILekq-t57LV11It2Qou1gA',
-      appId: '1:520484636432:android:c57394915f8e1d27e54795',
-      messagingSenderId: '520484636432',
-      projectId: 'plant-identifier---plant-care',
-      storageBucket: 'plant-identifier---plant-care.firebasestorage.app',
+      apiKey: 'AIzaSyCiWFyHePbnoVx1BdK5SNgyKV7w8PL7Ow0',
+      appId: '1:1098629987702:android:fcf0fe43de76d68f4ace57',
+      messagingSenderId: '1098629987702',
+      projectId: 'attentionanchor-6f8fe',
+      storageBucket: 'attentionanchor-6f8fe.firebasestorage.app',
     ),
   );
 
 
-    if (kReleaseMode) {
+    // if (kReleaseMode) {
     FlutterError.onError = (errorDetails) {
       FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
     };
@@ -71,7 +69,7 @@ void main() async {
 
     FirebaseAnalytics analytics = FirebaseAnalytics.instance;
     FirebaseAnalyticsObserver(analytics: analytics);
-  }
+  // }
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

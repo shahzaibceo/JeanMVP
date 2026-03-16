@@ -13,14 +13,15 @@ Future<void> showForceUpdateDialog(
   required String latestVersion,
   required String playStoreUrl,
 }) {
-   final themeCubit = context.watch<ThemeCubit>();
   return showDialog(
     context: context,
     barrierDismissible: false,
     builder: (context) {
-      return WillPopScope(
-        onWillPop: () async => false,
+      final themeCubit = context.watch<ThemeCubit>();
+      return PopScope(
+     canPop: false,
         child: AlertDialog(
+          backgroundColor: themeCubit.backgroundColor,
           title: CustomText(
             text: "update_required".tr(),
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -31,7 +32,7 @@ Future<void> showForceUpdateDialog(
           content: CustomText(
             text: "update_message".tr(),
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: themeCubit.textColor,
+              color: themeCubit.unselectedColor,
               fontWeight: FontWeight.w500,
             ),
           ),

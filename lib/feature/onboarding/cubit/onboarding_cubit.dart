@@ -9,7 +9,10 @@ class OnboardingCubit extends HydratedCubit<OnboardingState> {
   void completeOnboarding() => emit(state.copyWith(isCompleted: true));
 
   @override
-  OnboardingState? fromJson(Map<String, dynamic> json) => OnboardingState.fromJson(json);
+  OnboardingState? fromJson(Map<String, dynamic> json) {
+    final state = OnboardingState.fromJson(json);
+    return state.copyWith(selectedOption: 0);
+  }
 
   @override
   Map<String, dynamic>? toJson(OnboardingState state) => state.toJson();

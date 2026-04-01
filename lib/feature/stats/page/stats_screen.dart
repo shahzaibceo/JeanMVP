@@ -80,7 +80,7 @@ class StatsScreen extends StatelessWidget {
                       CustomText(
                         text: "weekly_stats".tr(),
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              color: themeCubit.textColor.withOpacity(0.7),
+                              color: themeCubit.textColor.withValues(alpha: 0.7),
                               fontWeight: FontWeight.w700,
                             ),
                       ),
@@ -111,7 +111,7 @@ class StatsScreen extends StatelessWidget {
                                 CustomText(
                                   text: "completion_rate_7d".tr(),
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                        color: themeCubit.textColor.withOpacity(0.6),
+                                        color: themeCubit.textColor.withValues(alpha: 0.6),
                                       ),
                                 ),
                               ],
@@ -126,10 +126,10 @@ class StatsScreen extends StatelessWidget {
                                     shape: BoxShape.circle,
                                   ),
                                 ),
-                                8.sbw(context),
+                                6.sbw(context),
                                 CustomText(
                                   text: "active_goal".tr(),
-                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                         color: AppColors.primary,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -168,41 +168,39 @@ class StatsScreen extends StatelessWidget {
                               CustomText(
                                 text: "monthly_avg".tr(),
                                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                      color: themeCubit.textColor.withOpacity(0.7),
+                                      color: themeCubit.textColor.withValues(alpha: 0.7),
                                       fontWeight: FontWeight.bold,
                                     ),
                               ),
                               20.sbh(context),
-                              Expanded(
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: resp.wp(80),
-                                      height: resp.wp(80),
-                                      child: CircularProgressIndicator(
-                                        value: monthlyAvg,
-                                        strokeWidth: 8,
-                                        backgroundColor: AppColors.primary.withOpacity(0.1),
-                                        valueColor: const AlwaysStoppedAnimation(AppColors.primary),
-                                        strokeCap: StrokeCap.round,
-                                      ),
+                              Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: resp.wp(70),
+                                    height: resp.wp(70),
+                                    child: CircularProgressIndicator(
+                                      value: monthlyAvg,
+                                      strokeWidth: 8,
+                                      backgroundColor: AppColors.primary.withValues(alpha:  0.1),
+                                      valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                                      strokeCap: StrokeCap.round,
                                     ),
-                                    CustomText(
-                                      text: "${(monthlyAvg * 100).toInt()}%",
-                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                            color: themeCubit.textColor,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                  CustomText(
+                                    text: "${(monthlyAvg * 100).toInt()}%",
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                          color: themeCubit.textColor,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                ],
                               ),
-                              10.sbh(context),
+                              20.sbh(context),
                               CustomText(
                                 text: "monthly_completion".tr(),
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: themeCubit.textColor.withOpacity(0.5),
+                                      color: themeCubit.textColor.withValues(alpha: 0.5),
                                     ),
                               ),
                             ],
@@ -221,7 +219,7 @@ class StatsScreen extends StatelessWidget {
                               CustomText(
                                 text: "best_streak_title".tr(),
                                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                      color: themeCubit.textColor.withOpacity(0.7),
+                                      color: themeCubit.textColor.withValues(alpha:   0.7),
                                       fontWeight: FontWeight.bold,
                                     ),
                               ),
@@ -229,12 +227,12 @@ class StatsScreen extends StatelessWidget {
                               CustomContainer(
                                 padding: EdgeInsets.all(resp.wp(12)),
                                 shape: BoxShape.circle,
-                                color: AppColors.primary.withOpacity(0.1),
+                                color: AppColors.primary.withValues(alpha:  0.1),
                                 child: Icon(Icons.emoji_events, color: AppColors.primary, size: resp.wp(30)),
                               ),
                               10.sbh(context),
                               CustomText(
-                                text: "${bestStreakHabit?.streak ?? 0} Days",
+                                text: "${bestStreakHabit?.streak ?? 0} ${"days".tr()}",
                                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                       color: themeCubit.textColor,
                                       fontWeight: FontWeight.bold,
@@ -244,7 +242,7 @@ class StatsScreen extends StatelessWidget {
                               CustomText(
                                 text: "personal_record".tr(),
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: themeCubit.textColor.withOpacity(0.5),
+                                      color: themeCubit.textColor.withValues(alpha:  0.5),
                                     ),
                               ),
                             ],
@@ -254,9 +252,7 @@ class StatsScreen extends StatelessWidget {
                     ],
                   ),
                   24.sbh(context),
-      
-                  
-                ],
+       ],
               ),
             );
           },
@@ -280,9 +276,9 @@ class StatsScreen extends StatelessWidget {
         ),
         10.sbh(context),
         CustomText(
-          text: day,
+          text: day.toLowerCase().tr(),
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: theme.textColor.withOpacity(0.6),
+                color: theme.textColor.withValues(alpha:  0.6),
                 fontWeight: FontWeight.w600,
               ),
         ),

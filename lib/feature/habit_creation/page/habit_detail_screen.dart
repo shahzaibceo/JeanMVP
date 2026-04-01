@@ -3,6 +3,7 @@ import 'package:attention_anchor/common/common_widget/custom_button.dart';
 import 'package:attention_anchor/common/common_widget/custom_conrtainer.dart';
 import 'package:attention_anchor/common/common_widget/custom_text.dart';
 import 'package:attention_anchor/common/common_widget/main_background.dart';
+import 'package:attention_anchor/common/common_widget/custom_snackbar_widget.dart';
 import 'package:attention_anchor/common/constants/image_strings/app_icons.dart';
 import 'package:attention_anchor/common/extensions/gesture_detector.dart';
 import 'package:attention_anchor/common/extensions/padding_extension.dart';
@@ -112,10 +113,25 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
               // Auto-pause when leaving the screen
               if (habit.timerIsRunning) {
                 habitCubit.pauseTimer(widget.habitIndex);
+                CustomSnackBar.show(context, message: "habit_paused_msg".tr());
               }
             }
           },
-          child: MainBackground(
+          child: BlocListener<HabitCubit, HabitState>(
+            listenWhen: (previous, current) {
+              if (widget.habitIndex < 0 ||
+                  widget.habitIndex >= current.habits.length) return false;
+              final prevHabit = previous.habits[widget.habitIndex];
+              final currHabit = current.habits[widget.habitIndex];
+              return prevHabit.timerElapsedPercent < 1.0 &&
+                  currHabit.timerElapsedPercent >= 1.0;
+            },
+            listener: (context, state) {
+              CustomSnackBar.show(context,
+                  message: "habit_completed_msg".tr(),
+                  backgroundColor: Colors.green);
+            },
+            child: MainBackground(
             appBar: AppBarWidget(
               showBack: true,
               title: "habits".tr(),
@@ -190,8 +206,16 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                     if (habit.timerElapsedPercent >= 1.0) return;
                     if (habit.timerIsRunning) {
                       habitCubit.pauseTimer(widget.habitIndex);
+                      CustomSnackBar.show(context, message: "habit_paused_msg".tr());
                     } else {
                       habitCubit.startTimer(widget.habitIndex, totalDuration);
+                      CustomSnackBar.show(
+                        context,
+                        message: (habit.timerElapsedPercent > 0
+                                ? "habit_resumed_msg"
+                                : "habit_started_msg")
+                            .tr(),
+                      );
                     }
                   }),
                 ),
@@ -320,10 +344,19 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
                                 if (habit.timerElapsedPercent >= 1.0) return;
                                 if (habit.timerIsRunning) {
                                   habitCubit.pauseTimer(widget.habitIndex);
+                                  CustomSnackBar.show(context,
+                                      message: "habit_paused_msg".tr());
                                 } else {
                                   habitCubit.startTimer(
                                     widget.habitIndex,
                                     totalDuration,
+                                  );
+                                  CustomSnackBar.show(
+                                    context,
+                                    message: (habit.timerElapsedPercent > 0
+                                            ? "habit_resumed_msg"
+                                            : "habit_started_msg")
+                                        .tr(),
                                   );
                                 }
                               },
@@ -368,7 +401,7 @@ class _HabitDetailsScreenState extends State<HabitDetailsScreen>
               ],
             ),
           ),
-        );
+        ));
       },
     );
   }

@@ -17,7 +17,7 @@ final PreferredSizeWidget? appBar;
         final isDark = state.isDark;
         final Color baseColor = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
         
-        final Color glowColor = AppColors.primary.withOpacity(isDark ? 0.10 : 0.1);
+        final Color glowColor = AppColors.primary.withValues(alpha: isDark ? 0.10 : 0.1);
 
         return Scaffold(
           backgroundColor: baseColor,

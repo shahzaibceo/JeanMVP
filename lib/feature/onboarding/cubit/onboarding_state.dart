@@ -5,7 +5,7 @@ class OnboardingState extends Equatable {
   final bool isCompleted;
 
   const OnboardingState({
-    this.selectedOption = 1,
+    this.selectedOption = 0,
     this.isCompleted = false,
   });
 
@@ -28,7 +28,7 @@ class OnboardingState extends Equatable {
 
   factory OnboardingState.fromJson(Map<String, dynamic> json) {
     return OnboardingState(
-      selectedOption: json['selectedOption'] as int? ?? 1,
+      selectedOption: json['selectedOption'] as int? ?? 0,
       isCompleted: json['isCompleted'] as bool? ?? false,
     );
   }

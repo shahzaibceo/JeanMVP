@@ -1,9 +1,9 @@
 import 'dart:developer';
 import 'dart:ui';
 import 'package:attention_anchor/feature/dashboard/cubit/dashboard_view_cubit.dart';
+import 'package:attention_anchor/feature/splash/page/splash_page.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:attention_anchor/feature/bottom_nav/cubit/bottom_cubit.dart';
-import 'package:attention_anchor/feature/bottom_nav/page/bottomnav_page.dart';
 import 'package:attention_anchor/feature/dashboard/cubit/dashboard_cubit.dart';
 import 'package:attention_anchor/feature/habit_creation/cubit/habit_cubit.dart';
 import 'package:attention_anchor/feature/onboarding/cubit/onboarding_cubit.dart';
@@ -19,7 +19,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:attention_anchor/feature/localization/cubit/language_cubit.dart';
-import 'package:attention_anchor/feature/localization/page/localization_page.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:attention_anchor/theme/theme.dart';
 import 'package:attention_anchor/common/utils/fcm_service/cubit/notification_cubit.dart';
@@ -106,7 +105,6 @@ class AppView extends StatelessWidget {
 Widget build(BuildContext context) {
   final themeState = context.watch<ThemeCubit>().state;
   final langState = context.watch<LanguageCubit>().state;
-  final onboardingState = context.watch<OnboardingCubit>().state;
 
   return MaterialApp(
     debugShowCheckedModeBanner: false,
@@ -123,9 +121,10 @@ Widget build(BuildContext context) {
         child: child ?? const SizedBox(),
       );
     },
-    home: onboardingState.isCompleted
-        ? const BottomNavigationBarScreen()
-        : const SelectLanguageScreen(showBackButton: false),
+    home: SplashScreen(),
+    // onboardingState.isCompleted
+    //     ? const BottomNavigationBarScreen()
+    //     : const SelectLanguageScreen(showBackButton: false),
   );
 }
 

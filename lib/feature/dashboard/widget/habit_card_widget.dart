@@ -133,7 +133,7 @@ class HabitCard extends StatelessWidget {
                 child: CustomButton(
                   height: resp.hp(48),
                   borderRadius: resp.radius(12),
-                  textSize: resp.fontSize(16),
+                  textSize: resp.fontSize(14),
                   text: "view_details".tr(),
                   onTap: () {
                     Navigator.push(
@@ -145,12 +145,12 @@ class HabitCard extends StatelessWidget {
                   },
                 ),
               ),
-              12.sbw(context),
+              10.sbw(context),
               Expanded(
                 child: CustomButton(
                      borderColor:  theme.greyColor, width: 0.1,
                   height: resp.hp(48),
-                  textSize: resp.fontSize(16),
+                  textSize: resp.fontSize(14),
                   borderRadius: resp.radius(12),
                   text: "skipped".tr(),
                   color: (isDone || (habit.streak == 0 && habit.lastCompletedDate != null))

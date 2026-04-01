@@ -41,7 +41,6 @@ class CustomButton extends StatelessWidget {
 
     final buttonColor = color ?? AppColors.primary;
     final buttonTextColor = textColor ?? AppColors.containerWhite;
-    // final buttonTextSize = textSize ?? responsive.fontSize(18);
 
     return CustomContainer(
       width: width ?? double.infinity,
@@ -59,12 +58,17 @@ class CustomButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CustomText(
-            text: text,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: fontWeight ?? FontWeight.w500,
-              color: buttonTextColor,
-              fontSize: textSize?? responsive.fontSize(20),
+          SizedBox(
+            // width:width  ,
+            child: CustomText(
+              maxLines: 1,
+              overflow: true,
+              text: text,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: fontWeight ?? FontWeight.w500,
+                color: buttonTextColor,
+                fontSize: textSize?? responsive.fontSize(20),
+              ),
             ),
           ),
           if (suffixIcon != null) ...[

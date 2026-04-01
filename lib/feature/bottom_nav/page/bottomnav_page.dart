@@ -1,5 +1,6 @@
 import 'package:attention_anchor/common/common_widget/custom_conrtainer.dart';
 import 'package:attention_anchor/common/common_widget/custom_text.dart';
+import 'package:attention_anchor/common/common_widget/dialog_box/dialog_box_widget.dart';
 import 'package:attention_anchor/common/constants/image_strings/app_icons.dart';
 import 'package:attention_anchor/common/extensions/gesture_detector.dart';
 import 'package:attention_anchor/common/extensions/sized_box.dart';
@@ -12,6 +13,7 @@ import 'package:attention_anchor/feature/stats/page/stats_screen.dart';
 import 'package:attention_anchor/theme/app_colors.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -32,7 +34,25 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> w
       const SettingsScreen(),
     ];
   }
+Future<bool> _onWillPop() async {
+  final themeCubit = context.read<ThemeCubit>();
 
+  showDialog(
+    context: context,
+    builder: (context) => CustomConfirmationDialog(
+      themeCubit: themeCubit,
+      title: "exit_app".tr(), 
+      message: "exit_confirmation".tr(),
+      confirmText: "yes".tr(), 
+      cancelText: "cancel".tr(),
+      onConfirm: () {
+        SystemNavigator.pop(); 
+      },
+    ),
+  );
+
+  return false; 
+}
   @override
   Widget build(BuildContext context) {
     final themeCubit = context.watch<ThemeCubit>(); 
@@ -49,118 +69,125 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> w
 
     return  BlocBuilder<BottomBarCubit, int>(
         builder: (context, selectedIndex) {
-          return Scaffold(
-            backgroundColor: themeCubit.backgroundColor,
-            body: IndexedStack(
-              index: selectedIndex,
-              children: _buildScreens(),
-            ),
-            bottomNavigationBar: SafeArea(
-              bottom: true,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CustomContainer(
-                    margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                    height: resp.wp(75), 
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        CustomPaint(
-                          size: Size(barWidth, 75),
-                          painter: BottomBarPainter(
-                            xOffset: (itemWidth * selectedIndex) + (itemWidth / 2),
-                            backgroundColor: themeCubit.containerColor,
-                            borderColor:  themeCubit.isDark ? AppColors.primary.withValues(alpha: 0.3) : AppColors.white,
-                            textDirection: Directionality.of(context),
-                          ),
-                        ),
-
-                        Builder(builder: (_) {
-                          double xOffset = (itemWidth * selectedIndex) + (itemWidth / 2);
-                          if (Directionality.of(context) == TextDirection.rtl) {
-                            xOffset = barWidth - xOffset;
-                          }
-                          return AnimatedPositioned(
-                            duration: const Duration(milliseconds: 350),
-                            curve: Curves.easeInOut,
-                            left: xOffset - 55,
-                            top: -25,
-                            child: Column(
-                              children: [
-                                CustomContainer(
-                                  width: resp.wp(55),
-                                  height: resp.hp(55),
-                                  shape: BoxShape.circle,
-                                  color: AppColors.primary,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.primary.withValues(alpha: 0.3),
-                                      blurRadius: resp.radius(10),
-                                      offset: const Offset(0, 5),
-                                    )
-                                  ],
-                                  child: Center(
-                                    child: SvgPicture.asset(
-                                      _navItems[selectedIndex]['icon'],
-                                      colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
-                                      width: resp.wp(28),
-                                    ),
-                                  ),
-                                ),
-                                8.sbh(context), 
-                            SizedBox(
-                              width: itemWidth,
-
-                                  child: CustomText(
-                                    textAlign: TextAlign.center,
-                                    text: _navItems[selectedIndex]['label'],
-                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                          color: themeCubit.textColor,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                  ),
-                                ),
-                              ],
+          return PopScope(
+                canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        await _onWillPop();
+      },
+            child: Scaffold(
+              backgroundColor: themeCubit.backgroundColor,
+              body: IndexedStack(
+                index: selectedIndex,
+                children: _buildScreens(),
+              ),
+              bottomNavigationBar: SafeArea(
+                bottom: true,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CustomContainer(
+                      margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                      height: resp.wp(75), 
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          CustomPaint(
+                            size: Size(barWidth, 75),
+                            painter: BottomBarPainter(
+                              xOffset: (itemWidth * selectedIndex) + (itemWidth / 2),
+                              backgroundColor: themeCubit.containerColor,
+                              borderColor:  themeCubit.isDark ? AppColors.primary.withValues(alpha: 0.3) : AppColors.white,
+                              textDirection: Directionality.of(context),
                             ),
-                          );
-                        }),
-
-                        Positioned.fill(
-                          right: resp.wp(20),
-                          left: resp.wp(20),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: List.generate(_navItems.length, (index) {
-                              if (index == selectedIndex) return SizedBox(width: itemWidth);
-                              
-                              return 
-                                CustomContainer(
-                                  width: resp.wp(48),
-                                  height: resp.hp(48),
-                                  color: AppColors.primary.withValues(alpha: 0.1),
-                                  shape: BoxShape.circle,
-                                  child: Center(
-                                    child: SvgPicture.asset(
-                                      _navItems[index]['icon'],
-                                      width: resp.wp(24),
-                                      colorFilter: ColorFilter.mode(
-                                        AppColors.primary, 
-                                        BlendMode.srcIn
+                          ),
+            
+                          Builder(builder: (_) {
+                            double xOffset = (itemWidth * selectedIndex) + (itemWidth / 2);
+                            if (Directionality.of(context) == TextDirection.rtl) {
+                              xOffset = barWidth - xOffset;
+                            }
+                            return AnimatedPositioned(
+                              duration: const Duration(milliseconds: 350),
+                              curve: Curves.easeInOut,
+                              left: xOffset - 55,
+                              top: -25,
+                              child: Column(
+                                children: [
+                                  CustomContainer(
+                                    width: resp.wp(55),
+                                    height: resp.hp(55),
+                                    shape: BoxShape.circle,
+                                    color: AppColors.primary,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.primary.withValues(alpha: 0.3),
+                                        blurRadius: resp.radius(10),
+                                        offset: const Offset(0, 5),
+                                      )
+                                    ],
+                                    child: Center(
+                                      child: SvgPicture.asset(
+                                        _navItems[selectedIndex]['icon'],
+                                        colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
+                                        width: resp.wp(28),
                                       ),
                                     ),
                                   ),
+                                  8.sbh(context), 
+                              SizedBox(
+                                width: itemWidth,
+            
+                                    child: CustomText(
+                                      textAlign: TextAlign.center,
+                                      text: _navItems[selectedIndex]['label'],
+                                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                            color: themeCubit.textColor,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+            
+                          Positioned.fill(
+                            right: resp.wp(20),
+                            left: resp.wp(20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: List.generate(_navItems.length, (index) {
+                                if (index == selectedIndex) return SizedBox(width: itemWidth);
                                 
-                              ).onTap((){
-                                 context.read<BottomBarCubit>().changeTab(index);
-                              });
-                            }),
+                                return 
+                                  CustomContainer(
+                                    width: resp.wp(48),
+                                    height: resp.hp(48),
+                                    color: AppColors.primary.withValues(alpha: 0.1),
+                                    shape: BoxShape.circle,
+                                    child: Center(
+                                      child: SvgPicture.asset(
+                                        _navItems[index]['icon'],
+                                        width: resp.wp(24),
+                                        colorFilter: ColorFilter.mode(
+                                          AppColors.primary, 
+                                          BlendMode.srcIn
+                                        ),
+                                      ),
+                                    ),
+                                  
+                                ).onTap((){
+                                   context.read<BottomBarCubit>().changeTab(index);
+                                });
+                              }),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

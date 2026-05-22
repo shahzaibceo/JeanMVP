@@ -37,10 +37,7 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
-        ndk {
-           abiFilters += listOf("arm64-v8a", "armeabi-v7a","x86_64")
        
-        }
     }
   signingConfigs {
         create("release") {
@@ -56,6 +53,12 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             isMinifyEnabled = true
             isShrinkResources = true
+            ndk {
+            abiFilters.addAll(listOf("armeabi-v7a","arm64-v8a"))
+            }
+            firebaseCrashlytics{
+                mappingFileUploadEnabled= true
+            }
             signingConfig = signingConfigs.getByName("release")
         }
     }

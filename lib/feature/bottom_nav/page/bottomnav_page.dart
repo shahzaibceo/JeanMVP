@@ -10,6 +10,7 @@ import 'package:attention_anchor/feature/dashboard/page/dashboard_screen.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
 import 'package:attention_anchor/feature/settings/pages/setting_page.dart';
 import 'package:attention_anchor/feature/stats/page/stats_screen.dart';
+import 'package:attention_anchor/feature/urge_log/page/urge_log_screen.dart';
 import 'package:attention_anchor/theme/app_colors.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,9 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> w
     return [
       const DashboardScreen(),
       const StatsScreen(),
+       const   UrgeLogScreen(),
       const SettingsScreen(),
+  
     ];
   }
 Future<bool> _onWillPop() async {
@@ -56,12 +59,13 @@ Future<bool> _onWillPop() async {
   @override
   Widget build(BuildContext context) {
     final themeCubit = context.watch<ThemeCubit>(); 
-    final resp = ResponsiveHelper(context);
 
     final List<Map<String, dynamic>> _navItems = [
       {'icon': AppIcons.home, 'label': "home".tr()},
       {'icon': AppIcons.streak, 'label': "streak".tr()},
+      {'icon': AppIcons.urge, 'label': "urge".tr()},
       {'icon': AppIcons.setting, 'label': "settings".tr()},
+  
     ];
 
     double barWidth = MediaQuery.of(context).size.width - 40;
@@ -88,98 +92,107 @@ Future<bool> _onWillPop() async {
                   children: [
                     CustomContainer(
                       margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                      height: resp.wp(75), 
+                      height: 75, 
                       child: Stack(
                         clipBehavior: Clip.none,
                         children: [
-                          CustomPaint(
-                            size: Size(barWidth, 75),
-                            painter: BottomBarPainter(
-                              xOffset: (itemWidth * selectedIndex) + (itemWidth / 2),
-                              backgroundColor: themeCubit.containerColor,
-                              borderColor:  themeCubit.isDark ? AppColors.primary.withValues(alpha: 0.3) : AppColors.white,
-                              textDirection: Directionality.of(context),
+                          TweenAnimationBuilder<double>(
+                            tween: Tween<double>(
+                              end: (itemWidth * selectedIndex) + (itemWidth / 2),
                             ),
-                          ),
-            
-                          Builder(builder: (_) {
-                            double xOffset = (itemWidth * selectedIndex) + (itemWidth / 2);
-                            if (Directionality.of(context) == TextDirection.rtl) {
-                              xOffset = barWidth - xOffset;
-                            }
-                            return AnimatedPositioned(
-                              duration: const Duration(milliseconds: 350),
-                              curve: Curves.easeInOut,
-                              left: xOffset - 55,
-                              top: -25,
-                              child: Column(
+                            duration: const Duration(milliseconds: 350),
+                            curve: Curves.easeInOut,
+                            builder: (context, animXOffset, child) {
+                              double activeXOffset = animXOffset;
+                              if (Directionality.of(context) == TextDirection.rtl) {
+                                activeXOffset = barWidth - animXOffset;
+                              }
+                              return Stack(
+                                clipBehavior: Clip.none,
                                 children: [
-                                  CustomContainer(
-                                    width: resp.wp(55),
-                                    height: resp.hp(55),
-                                    shape: BoxShape.circle,
-                                    color: AppColors.primary,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.primary.withValues(alpha: 0.3),
-                                        blurRadius: resp.radius(10),
-                                        offset: const Offset(0, 5),
-                                      )
-                                    ],
-                                    child: Center(
-                                      child: SvgPicture.asset(
-                                        _navItems[selectedIndex]['icon'],
-                                        colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
-                                        width: resp.wp(28),
-                                      ),
+                                  CustomPaint(
+                                    size: Size(barWidth, 75),
+                                    painter: BottomBarPainter(
+                                      xOffset: animXOffset,
+                                      backgroundColor: themeCubit.containerColor,
+                                      borderColor: themeCubit.isDark ? AppColors.primary.withValues(alpha: 0.3) : AppColors.white,
+                                      textDirection: Directionality.of(context),
                                     ),
                                   ),
-                                  8.sbh(context), 
-                              SizedBox(
-                                width: itemWidth,
-            
-                                    child: CustomText(
-                                      textAlign: TextAlign.center,
-                                      text: _navItems[selectedIndex]['label'],
-                                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                            color: themeCubit.textColor,
-                                            fontWeight: FontWeight.w700,
+                                  Positioned(
+                                    left: activeXOffset - (itemWidth / 2),
+                                    top: -25,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        CustomContainer(
+                                          width: 55,
+                                          height: 55,
+                                          shape: BoxShape.circle,
+                                          color: AppColors.primary,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppColors.primary.withValues(alpha: 0.3),
+                                              blurRadius: 10,
+                                              offset: const Offset(0, 5),
+                                            )
+                                          ],
+                                          child: Center(
+                                            child: SvgPicture.asset(
+                                              _navItems[selectedIndex]['icon'],
+                                              colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
+                                              width: 28,
+                                            ),
                                           ),
+                                        ),
+                                        8.sbh(context), 
+                                        SizedBox(
+                                          width: itemWidth,
+                                          child: CustomText(
+                                            textAlign: TextAlign.center,
+                                            text: _navItems[selectedIndex]['label'],
+                                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                                  color: themeCubit.textColor,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
-                              ),
-                            );
-                          }),
+                              );
+                            },
+                          ),
             
                           Positioned.fill(
-                            right: resp.wp(20),
-                            left: resp.wp(20),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: List.generate(_navItems.length, (index) {
-                                if (index == selectedIndex) return SizedBox(width: itemWidth);
-                                
-                                return 
-                                  CustomContainer(
-                                    width: resp.wp(48),
-                                    height: resp.hp(48),
-                                    color: AppColors.primary.withValues(alpha: 0.1),
-                                    shape: BoxShape.circle,
-                                    child: Center(
-                                      child: SvgPicture.asset(
-                                        _navItems[index]['icon'],
-                                        width: resp.wp(24),
-                                        colorFilter: ColorFilter.mode(
-                                          AppColors.primary, 
-                                          BlendMode.srcIn
-                                        ),
-                                      ),
-                                    ),
-                                  
-                                ).onTap((){
-                                   context.read<BottomBarCubit>().changeTab(index);
-                                });
+                                return SizedBox(
+                                  width: itemWidth,
+                                  child: Center(
+                                    child: index == selectedIndex
+                                        ? const SizedBox(width: 48)
+                                        : CustomContainer(
+                                            width: 48,
+                                            height: 48,
+                                            color: AppColors.primary.withValues(alpha: 0.1),
+                                            shape: BoxShape.circle,
+                                            child: Center(
+                                              child: SvgPicture.asset(
+                                                _navItems[index]['icon'],
+                                                width: 24,
+                                                colorFilter: const ColorFilter.mode(
+                                                  AppColors.primary, 
+                                                  BlendMode.srcIn
+                                                ),
+                                              ),
+                                            ),
+                                          ).onTap(() {
+                                            context.read<BottomBarCubit>().changeTab(index);
+                                          }),
+                                  ),
+                                );
                               }),
                             ),
                           ),
@@ -255,7 +268,7 @@ class BottomBarPainter extends CustomPainter {
     path.quadraticBezierTo(0, size.height, 0, size.height - radius);
     path.close();
 
-    canvas.drawShadow(path, Colors.black.withOpacity(0.05), 5, true);
+    canvas.drawShadow(path, Colors.black.withValues(alpha: 0.05), 5, true);
     canvas.drawPath(path, paint);
     canvas.drawPath(path, borderPaint);
   }

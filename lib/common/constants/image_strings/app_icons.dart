@@ -20,4 +20,5 @@ class AppIcons {
   static String streakIcon = 'assets/icons/streak_icon.svg';
   static String focus= 'assets/icons/focus.svg';
   static String focusdark= 'assets/icons/focus_dark.svg';
+   static String urge= 'assets/icons/urge.svg';
 }

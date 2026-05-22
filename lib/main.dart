@@ -56,7 +56,7 @@ void main() async {
   );
 
 
-    // if (kReleaseMode) {
+    if (kReleaseMode) {
     FlutterError.onError = (errorDetails) {
       FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
     };
@@ -68,7 +68,7 @@ void main() async {
 
     FirebaseAnalytics analytics = FirebaseAnalytics.instance;
     FirebaseAnalyticsObserver(analytics: analytics);
-  // }
+  }
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -92,6 +92,7 @@ class MyApp extends StatelessWidget {
            BlocProvider(create: (_) => SetupProgressCubit()),
            BlocProvider(create: (_) => DashboardViewCubit()),
            BlocProvider(create: (_) => NotificationCubit()),
+           
       ],
       child: const AppView(),
     );
@@ -122,9 +123,6 @@ Widget build(BuildContext context) {
       );
     },
     home: SplashScreen(),
-    // onboardingState.isCompleted
-    //     ? const BottomNavigationBarScreen()
-    //     : const SelectLanguageScreen(showBackButton: false),
   );
 }
 

@@ -166,8 +166,6 @@ class _ActionCard extends StatelessWidget {
               ],
             ),
           ),
-          Icon(Icons.chevron_right,
-              color: themeCubit.unselectedColor, size: resp.fontSize(20)),
         ],
       ),
     ).onTap(onTap);

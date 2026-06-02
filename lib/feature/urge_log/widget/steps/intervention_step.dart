@@ -137,7 +137,7 @@ class _BreathePromptCard extends StatelessWidget {
               topRight: Radius.circular(resp.radius(24)),
             ),
             child: SizedBox(
-              height: resp.hp(140), // Adjusted height to match proportions
+              height: resp.hp(140), 
               width: double.infinity,
               child: Image.asset(
                 AppImages.frame, 
@@ -217,20 +217,14 @@ class _BreathePromptCard extends StatelessWidget {
                 // "Skip for now" trigger link
                 Center(
                   child: CustomText(
-                    text: 'skip_for_now'.tr(),
+                    text: 'immediate_action'.tr(),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: const Color(0xFF4338CA),
                           fontWeight: FontWeight.w700,
                         ),
                   ).onTap(() {
-                       final flow = context.read<UrgeFlowCubit>();
-                  context
-                      .read<UrgeLogCubit>()
-                      .addEntry(flow.buildLogEntry());
-                  flow.stopBreathingIfNeeded();
-                  flow.reset();
-                  context.read<BottomBarCubit>().changeTab(0);
-                    // context.read<UrgeFlowCubit>().nextStep();
+                    context.read<UrgeFlowCubit>().selectAction(UrgeAction.immediate);
+                    context.read<UrgeFlowCubit>().nextStep();
                   }),
                 ),
                 4.sbh(context),

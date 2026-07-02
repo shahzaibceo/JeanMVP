@@ -89,8 +89,8 @@ class _SelectTriggerStepState extends State<SelectTriggerStep> {
               CustomTextFormField(
                 controller: _customController,
                 readOnly: false,
-                enableSuggestions: false,
-                autocorrect: false,
+                enableSuggestions: true,
+                autocorrect: true,
                 showBorder: true,
                 hintText: 'custom_trigger_hint'.tr(),
                 borderRadiusValue: 14,

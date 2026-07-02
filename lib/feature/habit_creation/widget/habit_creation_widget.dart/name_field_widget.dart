@@ -20,8 +20,8 @@ class HabitNameField extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomTextFormField(
          readOnly: false,
-                enableSuggestions: false,
-                autocorrect: false,
+                enableSuggestions: true,
+                autocorrect: true,
                 showBorder: true,
        textAlign: TextAlign.center,
       controller: controller,

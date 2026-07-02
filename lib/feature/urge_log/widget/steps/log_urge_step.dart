@@ -70,10 +70,10 @@ class _Legend extends StatelessWidget {
   const _Legend({required this.themeCubit, required this.resp});
 
   static final _rows = [
-    _LegendRow('1-3', 'severity_mild'.tr(), 'severity_mild_action'.tr(), const Color(0xFF22C55E)),
+     _LegendRow('1-3', 'severity_mild'.tr(), 'severity_mild_action'.tr(), const Color(0xFF22C55E)),
      _LegendRow('4-5', 'severity_moderate'.tr(), 'severity_moderate_action'.tr(), Color(0xFFFACC15)),
      _LegendRow('6-7', 'severity_high'.tr(), 'severity_high_action'.tr(), Color(0xFFF97316)),
-       _LegendRow('8-10', 'severity_very_high'.tr(), 'severity_very_high_action'.tr(), Color(0xFFEF4444)),
+     _LegendRow('8-10', 'severity_very_high'.tr(), 'severity_very_high_action'.tr(), Color(0xFFEF4444)),
   ];
 
   @override

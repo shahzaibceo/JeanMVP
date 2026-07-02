@@ -5,11 +5,9 @@ import 'package:attention_anchor/common/constants/image_strings/app_images.dart'
 import 'package:attention_anchor/common/extensions/gesture_detector.dart';
 import 'package:attention_anchor/common/extensions/sized_box.dart';
 import 'package:attention_anchor/common/utils/responsive_helper/responsive_helper.dart';
-import 'package:attention_anchor/feature/bottom_nav/cubit/bottom_cubit.dart';
 import 'package:attention_anchor/feature/localization/translation/app_translation.dart';
 import 'package:attention_anchor/feature/urge_log/cubit/urge_flow_cubit.dart';
 import 'package:attention_anchor/feature/urge_log/cubit/urge_flow_state.dart';
-import 'package:attention_anchor/feature/urge_log/cubit/urge_log_cubit.dart';
 import 'package:attention_anchor/theme/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
